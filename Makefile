@@ -7,8 +7,8 @@ MPIFC=mpif90
 #MPIFC=ftn
 FCFLAGS=-O3 -Wall -J $(OBJDIR) -I $(OBJDIR)
 
-adios_link=$(shell adios_config -lf)
-adios_inc=$(shell adios_config -cf)
+adios_link=$(shell /ccs/home/ccui/adios-gcc/build/bin/adios_config -lf)
+adios_inc=$(shell /ccs/home/ccui/adios-gcc/build/bin/adios_config -cf)
 
 objects= $(OBJDIR)/adios_helpers_definitions.o $(OBJDIR)/adios_helpers_writers.o $(OBJDIR)/adios_helpers.o $(OBJDIR)/gll_library.o $(OBJDIR)/global.o $(OBJDIR)/AdiosIO.o
 
