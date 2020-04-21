@@ -80,7 +80,7 @@ module model_update_tiso
 
   ! ======================================================
   ! KERNELS
-  integer, parameter :: NKERNELS = 1
+  integer, parameter :: NKERNELS = 2
   character(len=500), dimension(NKERNELS), parameter :: kernel_names = &
     (/character(len=150) :: "alpha_kl_crust_mantle"/)
   integer, parameter :: bulk_c_kl_idx = 2, betav_kl_idx = 2, betah_kl_idx = 2, &
