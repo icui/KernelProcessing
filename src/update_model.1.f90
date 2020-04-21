@@ -80,10 +80,14 @@ module model_update_tiso
 
   ! ======================================================
   ! KERNELS
-  integer, parameter :: NKERNELS = 1
+  integer, parameter :: NKERNELS = 4
   character(len=500), dimension(NKERNELS), parameter :: kernel_names = &
-    (/character(len=150) :: "alpha_crust_mantle"/)
-  integer, parameter :: alpha_kl_idx = 2
+    (/character(len=150) :: "bulk_c_kl_crust_mantle", &
+                            "bulk_betav_kl_crust_mantle", &
+                            "bulk_betah_kl_crust_mantle", &
+                            "eta_kl_crust_mantle"/)
+  integer, parameter :: bulk_c_kl_idx = 2, betav_kl_idx = 2, betah_kl_idx = 2, &
+                        eta_kl_idx = 2
   real(kind=CUSTOM_REAL), dimension(NGLLX,NGLLY,NGLLZ,NSPEC,NKERNELS) :: kernels = 0.0
   ! model updates
   real(kind=CUSTOM_REAL), dimension(NGLLX,NGLLY,NGLLZ,NSPEC,NKERNELS) :: dmodels = 0.0
@@ -282,8 +286,10 @@ module model_update_tiso
     real(kind=CUSTOM_REAL) :: betaiso0, betaiso1
     real(kind=CUSTOM_REAL) :: dbetaiso, dbulk
 
-    model_dbetav = dmodels(:, :, :, :, alpha_kl_idx)
-    model_dbetah = dmodels(:, :, :, :, alpha_kl_idx)
+    model_dbulk  = dmodels(:, :, :, :, bulk_c_kl_idx)
+    model_dbetav = dmodels(:, :, :, :, betav_kl_idx)
+    model_dbetah = dmodels(:, :, :, :, betah_kl_idx)
+    model_deta   = dmodels(:, :, :, :, eta_kl_idx)
 
     do ispec = 1, NSPEC
       do k = 1, NGLLZ
