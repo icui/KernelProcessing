@@ -16,17 +16,11 @@ module precond_kernels_sub
 
   contains
 
-  subroutine get_sys_args(input_file, output_file, threshold_hess)
+  subroutine get_sys_args(input_file, output_file)
     character(len=*), intent(inout) :: input_file, output_file
-    real(kind=CUSTOM_REAL), intent(inout) :: threshold_hess
-
-    character(len=20) :: threshold_str
 
     call getarg(1, input_file)
     call getarg(2, output_file)
-    call getarg(3, threshold_str)
-
-    read(threshold_str, *) threshold_hess
 
     if(input_file == '' .or. output_file == '') then
       call exit_mpi("Usage: xprecond_kernels input_kernel output_kernel")
@@ -35,7 +29,6 @@ module precond_kernels_sub
     if(myrank == 0) then
       write(*, *) "Input kernel: ", trim(input_file)
       write(*, *) "Output kernel: ", trim(output_file)
-      write(*, *) "Threshold hessian: ", threshold_hess
     endif
 
   end subroutine get_sys_args
@@ -88,11 +81,15 @@ program precond_kernels
 
   implicit none
 
-  integer, parameter :: NKERNELS = 6    !bulk_betah, bulk_betav, bulk_c, eta
+  real(kind=CUSTOM_REAL), parameter :: THRESHOLD_HESS=5.0e-4
+
+  integer, parameter :: NKERNELS = 2    !bulk_betah, bulk_betav, bulk_c, eta
   character(len=500), parameter :: kernel_names(NKERNELS) = &
-    (/character(len=500) :: "hess_kl_crust_mantle", "bulk_betah_kl_crust_mantle", &
-                            "bulk_betav_kl_crust_mantle", "bulk_c_kl_crust_mantle", &
-                            "eta_kl_crust_mantle", "rho_kl_crust_mantle"/)
+    (/character(len=500) :: "hess_kl_crust_mantle", "alpha_kl_crust_mantle"/)
+!  character(len=500), parameter :: kernel_names(NKERNELS) = &
+!    (/character(len=500) :: "hess_kl_crust_mantle", "bulk_betah_kl_crust_mantle", &
+!                            "bulk_betav_kl_crust_mantle", "bulk_c_kl_crust_mantle", &
+!                            "eta_kl_crust_mantle", "rho_kl_crust_mantle"/)
   integer, parameter :: hess_idx = 1
 
   real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC):: hess = 0.0, invHess = 0.0
@@ -100,7 +97,6 @@ program precond_kernels
                                                                           kernels_precond = 0.0
 
   character(len=500) :: input_file, output_file
-  real(kind=CUSTOM_REAL) :: threshold_hess
   integer:: ier, iker
 
   call init_mpi()
@@ -109,7 +105,7 @@ program precond_kernels
     call exit_mpi("hess_idx is wrong!")
   endif
 
-  call get_sys_args(input_file, output_file, threshold_hess)
+  call get_sys_args(input_file, output_file)
 
   call adios_read_init_method(ADIOS_READ_METHOD_BP, MPI_COMM_WORLD, &
                               "verbose=1", ier)
@@ -117,7 +113,7 @@ program precond_kernels
   call read_bp_file_real(input_file, kernel_names, kernels)
 
   hess = kernels(:, :, :, :, hess_idx)
-  call prepare_hessian(hess, threshold_hess, invHess)
+  call prepare_hessian(hess, THRESHOLD_HESS, invHess)
 
   ! precond the kernel
   do iker = 1, NKERNELS
