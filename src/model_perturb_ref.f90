@@ -67,7 +67,7 @@ module perturb_subs
                 ONE_THIRD  * new_model(:, :, :, :, vsh_idx) ** 2)
     dvs = abs(log(vs_1 / vs_0))
 
-    dvp_vs_ratio = log( (vp_1/vs_1) / (vp_0/vs_0))
+    dvp_vs_ratio = abs(log( (vp_1/vs_1) / (vp_0/vs_0)))
 
     tmpArr0 = (ref_model(:,:,:,:,vsh_idx) - ref_model(:,:,:,:,vsv_idx)) / vs_0
     tmpArr1 = (new_model(:,:,:,:,vsh_idx) - new_model(:,:,:,:,vsv_idx)) / vs_1
