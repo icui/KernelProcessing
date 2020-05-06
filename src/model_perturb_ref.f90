@@ -59,13 +59,15 @@ module perturb_subs
 
     vp_0 = ref_model(:, :, :, :, vpv_idx)
     vp_1 = new_model(:, :, :, :, vpv_idx)
-    dvp = log(vp_1 / vp_0)
+    ! dvp = log(vp_1 / vp_0)
+    dvp = (vp_1 - vp_0) ** 2
 
     vs_0 = sqrt(TWO_THIRDS * ref_model(:, :, :, :, vsv_idx) ** 2 + &
                 ONE_THIRD  * ref_model(:, :, :, :, vsh_idx) ** 2)
     vs_1 = sqrt(TWO_THIRDS * new_model(:, :, :, :, vsv_idx) ** 2 + &
                 ONE_THIRD  * new_model(:, :, :, :, vsh_idx) ** 2)
-    dvs = log(vs_1 / vs_0)
+    ! dvs = log(vs_1 / vs_0)
+    dvs = (vs_s - vs_0) ** 2
 
     dvp_vs_ratio = log( (vp_1/vs_1) / (vp_0/vs_0))
 
