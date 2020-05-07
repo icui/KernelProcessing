@@ -23,7 +23,7 @@ module misfit_subs
     use global, only : myrank
     use global, only : exit_mpi
     implicit none
-    character(len=500), intent(in) :: ref_model_file, solver_file
+    character(len=500), intent(in) :: ref_model_file, new_model_file, solver_file
 
     call getarg(1, ref_model_file)
     call getarg(2, new_model_file)
