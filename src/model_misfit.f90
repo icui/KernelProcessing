@@ -46,7 +46,8 @@ program main
 
   use mpi
   use adios_read_mod
-  use global, only : CUSTOM_REAL, NGLLX, NGLLY, NGLLZ, NSPEC, myrank, init_mpi
+  use global, only : CUSTOM_REAL, NGLLX, NGLLY, NGLLZ, NSPEC, myrank, init_mpi, &
+    Parallel_ComputeL2normSquare, calculate_jacobian_matrix
   use AdiosIO
   use misfit_subs
   implicit none
