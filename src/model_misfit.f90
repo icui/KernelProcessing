@@ -16,7 +16,7 @@ module misfit_subs
   character(len=500), dimension(6), parameter :: perturb_names = &
     (/character(len=500) :: "reg1/dvpvvpv", "reg1/dvphvph", "reg1/dvsvvsv", &
                             "reg1/dvshvsh", "reg1/detaeta", "reg1/drhorho"/)
-  real(kind=CUSTOM_REAL), dimension(NGLLX, NGLLY, NGLLZ, NSPEC, nvars+5) :: perturb_model
+  real(kind=CUSTOM_REAL), dimension(NGLLX, NGLLY, NGLLZ, NSPEC, nvars) :: perturb_model
 
   contains
   subroutine get_sys_args(ref_model_file, new_model_file)
