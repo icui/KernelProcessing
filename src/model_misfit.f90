@@ -13,7 +13,7 @@ module perturb_subs
                                                                           new_model
   ! 6 parameter perturbation + 5 extra perturbation
   ! don't change the order unless you know what you are doing
-  character(len=500), dimension(11), parameter :: perturb_names = &
+  character(len=500), dimension(6), parameter :: perturb_names = &
     (/character(len=500) :: "reg1/dvpvvpv", "reg1/dvphvph", "reg1/dvsvvsv", &
                             "reg1/dvshvsh", "reg1/detaeta", "reg1/drhorho"/)
 
