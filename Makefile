@@ -83,7 +83,7 @@ $(BINDIR)/xupdate_model: $(OBJDIR)/update_model.o $(objects)
 $(BINDIR)/xmodel_perturb_ref: $(OBJDIR)/model_perturb_ref.o $(objects)
 	$(MPIFC) $(FCFLAGS) -o $@ $^ $(adios_link) $(adios_inc)
 
-$(BINDIR)/model_misfit: $(OBJDIR)/model_misfit.o $(objects)
+$(BINDIR)/xmodel_misfit: $(OBJDIR)/model_misfit.o $(objects)
 	$(MPIFC) $(FCFLAGS) -o $@ $^ $(adios_link) $(adios_inc)
 
 $(BINDIR)/xgauss_psf: $(OBJDIR)/gaussian_perturb_psf.o $(objects)
