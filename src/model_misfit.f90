@@ -53,7 +53,7 @@ program main
 
   character(len=500) :: ref_model_file, new_model_file, solver_file
   real(kind=CUSTOM_REAL) :: model_misfit
-  real(kind=CUSTOM_REAL), dimension(NGLLX, NGLLY, NGLLZ, NSPEC) :: jacobianß
+  real(kind=CUSTOM_REAL), dimension(NGLLX, NGLLY, NGLLZ, NSPEC) :: jacobian
 
   integer :: ier
 
