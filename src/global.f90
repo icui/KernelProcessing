@@ -212,7 +212,7 @@ module global
     call build_gll_weight(wgll_cube)
 
     qp_dp=0.d0
-    do ipar=1,1
+    do ipar=2,2
       do ispec = 1, NSPEC
         do k=1,NGLLZ
           do j=1,NGLLY
