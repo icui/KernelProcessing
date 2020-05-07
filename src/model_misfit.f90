@@ -63,7 +63,7 @@ program main
   call read_bp_file_real(ref_model_file, model_names, ref_model)
   call read_bp_file_real(new_model_file, model_names, new_model)
 
-  perturb_model = (new_model - ref_model)
+  perturb_model = log(new_model / ref_model)
   call calculate_jacobian_matrix(solver_file, jacobian)
   call Parallel_ComputeL2normSquare(perturb_model, 6, jacobian, model_misfit)
 
