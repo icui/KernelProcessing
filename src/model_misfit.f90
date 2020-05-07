@@ -1,4 +1,4 @@
-module perturb_subs
+module misfit_subs
   use global, only : CUSTOM_REAL, NGLLX, NGLLY, NGLLZ, NSPEC, myrank, init_mpi
   implicit none
 
@@ -37,7 +37,7 @@ module perturb_subs
     endif
   end subroutine get_sys_args
 
-end module perturb_subs
+end module misfit_subs
 
 program main
 
@@ -45,7 +45,7 @@ program main
   use adios_read_mod
   use global, only : CUSTOM_REAL, NGLLX, NGLLY, NGLLZ, NSPEC, myrank, init_mpi
   use AdiosIO
-  use perturb_subs
+  use misfit_subs
   implicit none
 
   character(len=500) :: ref_model_file, new_model_file
@@ -67,7 +67,7 @@ program main
   call read_bp_file_real(new_model_file, model_names, new_model)
   if(myrank == 0) print*, "Done reading"
 
-  perturb_model(:,:,:,:,1:6) = log(new_model / ref_model)
+  perturb_model(:,:,:,:,1:6) = log(new_model - ref_model)
 
   call adios_finalize(myrank, ier)
   call MPI_FINALIZE(ier)
