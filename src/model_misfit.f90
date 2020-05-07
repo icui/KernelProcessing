@@ -65,7 +65,7 @@ program main
 
   perturb_model = (new_model - ref_model)
   call calculate_jacobian_matrix(solver_file, jacobian)
-  call Parallel_ComputeL2normSquare(perturb_model, 6, jacobian, model_misfit)
+  call Parallel_ComputeL2normSquare(perturb_model, 1, jacobian, model_misfit)
 
   call adios_finalize(myrank, ier)
   call MPI_FINALIZE(ier)
