@@ -67,7 +67,7 @@ program main
   call read_bp_file_real(new_model_file, model_names, new_model)
   if(myrank == 0) print*, "Done reading"
 
-  perturb_model(:,:,:,:,1:6) = log(new_model / ref_model)
+  perturb_model = log(new_model / ref_model)
 
   call adios_finalize(myrank, ier)
   call MPI_FINALIZE(ier)
