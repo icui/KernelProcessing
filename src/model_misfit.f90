@@ -33,11 +33,6 @@ module misfit_subs
       call exit_mpi('Usage: xmodel_perturbs ref_model_file new_model_file')
     endif
 
-    if (myrank == 0) then
-      print*, "ref model file: ", trim(ref_model_file)
-      print*, "new model file: ", trim(new_model_file)
-      print*, "solver file: ", trim(solver_file)
-    endif
   end subroutine get_sys_args
 
 end module misfit_subs
@@ -60,18 +55,13 @@ program main
 
   call init_mpi()
 
-  if(myrank == 0) print*, "mpi done"
-
   call get_sys_args(ref_model_file, new_model_file, solver_file)
  
   call adios_read_init_method(ADIOS_READ_METHOD_BP, MPI_COMM_WORLD, &
                                   "verbose=1", ier)
 
-  if(myrank == 0) print*, "Read ref model file"
   call read_bp_file_real(ref_model_file, model_names, ref_model)
-  if(myrank == 0) print*, "Read new model file"
   call read_bp_file_real(new_model_file, model_names, new_model)
-  if(myrank == 0) print*, "Done reading"
 
   perturb_model = (new_model / ref_model)
   call calculate_jacobian_matrix(solver_file, jacobian)
@@ -80,7 +70,6 @@ program main
   call adios_finalize(myrank, ier)
   call MPI_FINALIZE(ier)
 
-  print *, "model misfit:", model_misfit
-  if(myrank == 0) print*, "Job finished"
+  if(myrank == 0) print *, "model misfit:", model_misfit
 
 end program main
