@@ -121,17 +121,13 @@ module global
       do j=1,NGLLY
         do i=1,NGLLX
            wgll_cube(i,j,k) = wxgll(i)*wygll(j)*wzgll(k)
+
+           if (k .ne. 1) then
+            wgll_cube(i,j,k) = 0.0
+           endif
         enddo
       enddo
     enddo
-
-    ! do k=2,NGLLZ
-    !   do j=1,NGLLY
-    !     do i=1,NGLLX
-    !        wgll_cube(i,j,k) = 0
-    !     enddo
-    !   enddo
-    ! enddo
 
   end subroutine build_gll_weight
 
