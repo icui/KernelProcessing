@@ -117,7 +117,7 @@ module global
     call zwgljd(yigll,wygll,NGLLY,GAUSSALPHA,GAUSSBETA)
     call zwgljd(zigll,wzgll,NGLLZ,GAUSSALPHA,GAUSSBETA)
 
-    do k=1,NGLLZ-1
+    do k=2,NGLLZ
       do j=2,NGLLY-1
         do i=2,NGLLX-1
            wgll_cube(i,j,k) = wxgll(i)*wygll(j)*wzgll(k)
