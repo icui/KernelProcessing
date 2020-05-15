@@ -121,30 +121,9 @@ module global
       do j=1,NGLLY
         do i=1,NGLLX
            wgll_cube(i,j,k) = wxgll(i)*wygll(j)*wzgll(k)
-
-           if (k .eq. 1) then
-            wgll_cube(i,j,k) = 0.0
-           endif
-
-           if (i .eq. 1) then
-            wgll_cube(i,j,k) = 0.0
-           endif
-
-           if (i .eq. NGLLX) then
-            wgll_cube(i,j,k) = 0.0
-           endif
-
-           if (j .eq. 1) then
-            wgll_cube(i,j,k) = 0.0
-           endif
-
-           if (j .eq. NGLLX) then
-            wgll_cube(i,j,k) = 0.0
-           endif
         enddo
       enddo
     enddo
-
   end subroutine build_gll_weight
 
   subroutine Parallel_ComputeInnerProduct(vect1, vect2, Niv, jacobian, qp)
