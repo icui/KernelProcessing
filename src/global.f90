@@ -117,7 +117,7 @@ module global
     call zwgljd(yigll,wygll,NGLLY,GAUSSALPHA,GAUSSBETA)
     call zwgljd(zigll,wzgll,NGLLZ,GAUSSALPHA,GAUSSBETA)
 
-    do k=1,NGLLZ-1
+    do k=1,NGLLZ
       do j=1,NGLLY
         do i=1,NGLLX
            wgll_cube(i,j,k) = wxgll(i)*wygll(j)*wzgll(k)
@@ -214,9 +214,9 @@ module global
     qp_dp=0.d0
     do ipar=1,Niv
       do ispec = 1, NSPEC
-        do k=1,NGLLZ
-          do j=1,NGLLY
-            do i=1,NGLLX
+        do k=2,NGLLZ-1
+          do j=2,NGLLY-1
+            do i=2,NGLLX-1
               weight = wgll_cube(i, j, k)
               jacobianl = jacobian(i, j, k, ispec)
               qp_dp = qp_dp + jacobianl * weight * (wks_1n(i,j,k,ispec,ipar)**2)
