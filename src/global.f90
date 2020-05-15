@@ -124,6 +124,15 @@ module global
         enddo
       enddo
     enddo
+
+    do k=2,NGLLZ
+      do j=1,NGLLY
+        do i=1,NGLLX
+           wgll_cube(i,j,k) = 0
+        enddo
+      enddo
+    enddo
+
   end subroutine build_gll_weight
 
   subroutine Parallel_ComputeInnerProduct(vect1, vect2, Niv, jacobian, qp)
