@@ -214,7 +214,7 @@ module global
     qp_dp=0.d0
     do ipar=1,Niv
       do ispec = 1, NSPEC
-        do k=3,3
+        do k=1,1
           do j=3,3
             do i=3,3
               weight = wgll_cube(i, j, k)
