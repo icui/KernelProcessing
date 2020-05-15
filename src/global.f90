@@ -165,7 +165,7 @@ module global
     qp_tmp=0._CUSTOM_REAL
     do ipar=1, Niv
       do ispec = 1, NSPEC
-        do k=1,NGLLZ
+        do k=1,1
           do j=1,NGLLY
             do i=1,NGLLX
               weight = wgll_cube(i, j, k)
