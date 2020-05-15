@@ -122,7 +122,7 @@ module global
         do i=1,NGLLX
            wgll_cube(i,j,k) = wxgll(i)*wygll(j)*wzgll(k)
 
-           if (k .ne. 1) then
+           if (k .ne. 5) then
             wgll_cube(i,j,k) = 0.0
            endif
         enddo
