@@ -215,8 +215,8 @@ module global
     do ipar=1,Niv
       do ispec = 1, NSPEC
         do k=3,3
-          do j=2,NGLLY-1
-            do i=2,NGLLX-1
+          do j=3,3
+            do i=3,3
               weight = wgll_cube(i, j, k)
               jacobianl = jacobian(i, j, k, ispec)
               qp_dp = qp_dp + jacobianl * weight * (wks_1n(i,j,k,ispec,ipar)**2)
