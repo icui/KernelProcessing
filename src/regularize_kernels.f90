@@ -117,11 +117,6 @@ module regularize_kernels_sub
       enddo
     enddo
 
-    if(myrank == 0) print *, "Old Kernel:"
-    call stats_value_range(kernels, kernel_names)
-    if(myrank == 0) print *, "New Kernel:"
-    call stats_value_range(kernels_damp, kernel_names)
-
   end subroutine regularize_kernel
 
 end module regularize_kernels_sub
