@@ -45,7 +45,7 @@ module regularize_kernels_sub
 
   subroutine get_sys_args(input_file, input_model, output_file, step_fac)
     character(len=*), intent(inout) :: input_file, input_model, output_file
-    real(kind=CUSTOM_REAL), intent(inout) :: threshold_hess
+    real(kind=CUSTOM_REAL), intent(inout) :: step_fac
 
     character(len=20) :: step_fac_str
 
