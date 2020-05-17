@@ -89,7 +89,7 @@ module regularize_kernels_sub
     call max_all_all_cr(maxval(abs(kernels(:, :, :, :, betav_kl_idx))), maxv_kl_all)
     call max_all_all_cr(maxval(abs(models(:, :, :, :, vsv_idx))), maxv_all)
 
-    step_len = maxh_all / maxv_all * step_fac
+    step_len = maxv_kl_all / maxv_all * step_fac
 
     if(myrank == 0) then
       write(*, *) "Regularization parameter: ", step_len
