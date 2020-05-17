@@ -5,7 +5,7 @@ BINDIR = bin
 FC=gfortran
 MPIFC=mpif90
 #MPIFC=ftn
-FCFLAGS=-O3 -Wall -J $(OBJDIR) -I $(OBJDIR)
+FCFLAGS=-O3 -Wall -J $(OBJDIR) -I $(OBJDIR) -Wno-unused-dummy-argument
 
 adios_link=$(shell /ccs/home/ccui/adios-gcc/build/bin/adios_config -lf)
 adios_inc=$(shell /ccs/home/ccui/adios-gcc/build/bin/adios_config -cf)

@@ -10,7 +10,7 @@
 
 module regularize_kernels_sub
   use mpi
-  use global, only : myrank, nprocs, NGLLX, NGLLY, NGLLZ, NSPEC, NGLOB, CUSTOM_REAL
+  use global, only : myrank, nprocs, NGLLX, NGLLY, NGLLZ, NSPEC, NGLOB, CUSTOM_REAL, exit_mpi
   use AdiosIO
 
   implicit none
