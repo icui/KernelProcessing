@@ -111,11 +111,11 @@ module regularize_kernels_sub
             bulk_c = sqrt(alphav ** 2 - FOUR_THIRDS * betav ** 2)
 
             ! initial kernel values
-            betav_kl  = models(i,j,k,ispec,betav_kl_idx)
-            betah_kl  = models(i,j,k,ispec,betah_kl_idx)
-            bulk_c_kl = models(i,j,k,ispec,bulk_c_kl_idx)
-            eta_kl    = models(i,j,k,ispec,eta_kl_idx)
-            rho_kl    = models(i,j,k,ispec,rho_kl_idx)
+            betav_kl  = kernels(i,j,k,ispec,betav_kl_idx)
+            betah_kl  = kernels(i,j,k,ispec,betah_kl_idx)
+            bulk_c_kl = kernels(i,j,k,ispec,bulk_c_kl_idx)
+            eta_kl    = kernels(i,j,k,ispec,eta_kl_idx)
+            rho_kl    = kernels(i,j,k,ispec,rho_kl_idx)
 
             ! regularized kernel values
             kernels_damp(i,j,k,ispec,betav_kl_idx) = betav_kl + step_len * betav
