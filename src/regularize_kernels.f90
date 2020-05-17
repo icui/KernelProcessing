@@ -52,9 +52,9 @@ module regularize_kernels_sub
     character(len=20) :: step_fac_str
 
     call getarg(1, input_file)
-    call getarg(1, input_model)
-    call getarg(2, output_file)
-    call getarg(3, step_fac_str)
+    call getarg(2, input_model)
+    call getarg(3, output_file)
+    call getarg(4, step_fac_str)
 
     read(step_fac_str, *) step_fac
 
