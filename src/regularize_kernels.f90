@@ -10,24 +10,51 @@
 
 module regularize_kernels_sub
   use mpi
-  use global, only : max_all_all_cr, min_all_all_cr, CUSTOM_REAL, exit_mpi, &
-                     myrank
+  use global, only : CUSTOM_REAL, exit_mpi, myrank
   implicit none
+
+  ! ======================================================
+  ! MODELS
+  integer, parameter :: NMODELS = 6
+  character(len=500), dimension(NMODELS), parameter :: model_names = &
+    (/character(len=500) :: "reg1/vpv", "reg1/vph", "reg1/vsv", &
+                            "reg1/vsh", "reg1/eta", "reg1/rho"/)
+  integer, parameter :: vpv_idx=1, vph_idx=2, vsv_idx=3, vsh_idx=4, &
+                        eta_idx=5, rho_idx=6
+  character(len=500), dimension(NMODELS), parameter :: model_perturb_names = &
+    (/character(len=150) :: "reg1/dvpvvpv","reg1/dvphvph","reg1/dvsvvsv", &
+                            "reg1/dvshvsh","reg1/detaeta","reg1/drhorho"/)
+  ! transverse isotropic model files
+  real(kind=CUSTOM_REAL), dimension(NGLLX,NGLLY,NGLLZ,NSPEC,NMODELS) :: models = 0.0
+
+  ! ======================================================
+  ! KERNELS
+
+  integer, parameter :: NKERNELS = 6    !bulk_betah, bulk_betav, bulk_c, eta
+  character(len=500), parameter :: kernel_names(NKERNELS) = &
+    (/character(len=500) :: "hess_kl_crust_mantle", "bulk_betah_kl_crust_mantle", &
+                            "bulk_betav_kl_crust_mantle", "bulk_c_kl_crust_mantle", &
+                            "eta_kl_crust_mantle", "rho_kl_crust_mantle"/)
+  integer, parameter :: hess_idx = 1, betah_kl_idx = 2, betav_kl_idx = 3, &
+                        bulk_c_kl_idx = 4, eta_kl_idx = 5, rho_kl_idx = 6
+
+  real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC, NKERNELS):: kernels = 0.0, &
+                                                                          kernels_damp = 0.0
 
   contains
 
-  subroutine get_sys_args(input_file, input_model, output_file, lambda)
+  subroutine get_sys_args(input_file, input_model, output_file, step_fac)
     character(len=*), intent(inout) :: input_file, input_model, output_file
     real(kind=CUSTOM_REAL), intent(inout) :: threshold_hess
 
-    character(len=20) :: lambda_str
+    character(len=20) :: step_fac_str
 
     call getarg(1, input_file)
     call getarg(1, input_model)
     call getarg(2, output_file)
-    call getarg(3, lambda_str)
+    call getarg(3, step_fac_str)
 
-    read(lambda_str, *) lambda
+    read(step_fac_str, *) step_fac
 
     if(input_file == '' .or. input_model == '' .or. output_file == '') then
       call exit_mpi("Usage: xregularize_kernels input_kernel input_model output_kernel")
@@ -37,50 +64,67 @@ module regularize_kernels_sub
       write(*, *) "Input kernel: ", trim(input_file)
       write(*, *) "Input model: ", trim(input_model)
       write(*, *) "Output kernel: ", trim(output_file)
-      write(*, *) "Regularization factor: ", lambda
+      write(*, *) "Regularization factor: ", step_fac
     endif
 
   end subroutine get_sys_args
 
-  subroutine prepare_hessian(hess, threshold, invHess)
-    real(CUSTOM_REAL), dimension(:, :, :, :), intent(inout) :: hess, invHess
-    real(CUSTOM_REAL), intent(in) :: threshold
+  subroutine regularize_kernel(step_fac)
+    use global , only : FOUR_THIRDS
+    ! DMP regularization:
+    ! J = J0 + step_fac * ||m||^2
+    ! K = K0 + step_fac * m
+    ! H = H0 + step_fac
 
-    real(kind=CUSTOM_REAL):: maxh_all, minh_all
+    real(kind=CUSTOM_REAL), intent(inout) :: step_fac
 
-    call max_all_all_cr(maxval(hess), maxh_all)
-    call min_all_all_cr(minval(hess), minh_all)
+    integer :: i, j, k, ispec
+    real(kind=CUSTOM_REAL) :: alphav, alphah, betav, betah, eta, rho, bulk_c
+    real(kind=CUSTOM_REAL) :: betav_kl, betah_kl, bulk_c_kl, eta_kl, rho_kl
 
-    if ( maxh_all < 1.e-18 ) then
-      call exit_mpi("hess max value < 1.e-18")
-    end if
+    kernels_damp(:, :, :, :, hess_idx) = kernels(:, :, :, :, hess_idx) + step_fac
 
-    if (myrank==0) then
-      write(*, *) "Max and Min of hess: ", maxh_all, minh_all
-      write(*, *) 'Normalize factor(max hess) for all processors ', maxh_all
-    endif
+    do ispec = 1, NSPEC
+      do k = 1, NGLLZ
+        do j = 1, NGLLY
+          do i = 1, NGLLX
+            ! initial model values
+            alphav = models(i,j,k,ispec,vpv_idx)
+            alphah = models(i,j,k,ispec,vph_idx)
+            betav  = models(i,j,k,ispec,vsv_idx)
+            betah  = models(i,j,k,ispec,vsh_idx)
+            eta    = models(i,j,k,ispec,eta_idx)
+            rho    = models(i,j,k,ispec,rho_idx)
+            bulk_c = sqrt(alphav ** 2 - FOUR_THIRDS * betav ** 2)
 
-    ! normalized hess
-    hess = hess / maxh_all
+            ! initial kernel values
+            betav_kl  = models(i,j,k,ispec,betav_kl_idx)
+            betah_kl  = models(i,j,k,ispec,betah_kl_idx)
+            bulk_c_kl = models(i,j,k,ispec,bulk_c_kl_idx)
+            eta_kl    = models(i,j,k,ispec,eta_kl_idx)
+            rho_kl    = models(i,j,k,ispec,rho_kl_idx)
 
-    call max_all_all_cr(maxval(hess), maxh_all)
-    call min_all_all_cr(minval(hess), minh_all)
+            ! regularized kernel values
+            kernels_damp(i,j,k,ispec,betav_kl_idx) = betav_kl + step_fac * betav
+            kernels_damp(i,j,k,ispec,betah_kl_idx) = betah_kl + step_fac * betah
+            kernels_damp(i,j,k,ispec,bulk_c_kl_idx) = bulk_c_kl + step_fac * bulk_c
+            kernels_damp(i,j,k,ispec,eta_kl_idx) = eta_kl + step_fac * rho
+            kernels_damp(i,j,k,ispec,rho_kl_idx) = rho_kl + step_fac * rho
+          enddo
+        enddo
+      enddo
+    enddo
 
-    if (myrank==0) then
-      write(*, *) 'min and max hess after norm', minh_all, maxh_all
-      write(*, *) "Hessian Threshold: ", threshold
-    endif
+    if(myrank == 0) print *, "Old Kernel:"
+    call stats_value_range(kernels, kernel_names)
+    if(myrank == 0) print *, "New Kernel:"
+    call stats_value_range(kernels_damp, kernel_names)
 
-    where(hess > threshold )
-      invHess = 1.0_CUSTOM_REAL / hess
-    elsewhere
-      invHess = 1.0_CUSTOM_REAL / threshold
-    endwhere
-  end subroutine prepare_hessian
+  end subroutine regularize_kernel
 
 end module regularize_kernels_sub
 
-program precond_kernels
+program regularize_kernels
   use mpi
   use adios_read_mod
   use AdiosIO
@@ -90,20 +134,9 @@ program precond_kernels
 
   implicit none
 
-  integer, parameter :: NKERNELS = 6    !bulk_betah, bulk_betav, bulk_c, eta
-  character(len=500), parameter :: kernel_names(NKERNELS) = &
-    (/character(len=500) :: "hess_kl_crust_mantle", "bulk_betah_kl_crust_mantle", &
-                            "bulk_betav_kl_crust_mantle", "bulk_c_kl_crust_mantle", &
-                            "eta_kl_crust_mantle", "rho_kl_crust_mantle"/)
-  integer, parameter :: hess_idx = 1
-
-  real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC):: hess = 0.0, invHess = 0.0
-  real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC, NKERNELS):: kernels = 0.0, &
-                                                                          kernels_precond = 0.0
-
-  character(len=500) :: input_file, output_file
-  real(kind=CUSTOM_REAL) :: threshold_hess
-  integer:: ier, iker
+  character(len=500) :: input_file, input_model, output_file
+  real(kind=CUSTOM_REAL) :: step_fac
+  integer:: ier
 
   call init_mpi()
 
@@ -111,27 +144,18 @@ program precond_kernels
     call exit_mpi("hess_idx is wrong!")
   endif
 
-  call get_sys_args(input_file, output_file, threshold_hess)
+  call get_sys_args(input_file, input_model, output_file, step_fac)
 
   call adios_read_init_method(ADIOS_READ_METHOD_BP, MPI_COMM_WORLD, &
                               "verbose=1", ier)
 
   call read_bp_file_real(input_file, kernel_names, kernels)
+  call read_bp_file_real(input_model, model_names, models)
 
-  hess = kernels(:, :, :, :, hess_idx)
-  call prepare_hessian(hess, threshold_hess, invHess)
+  ! apply DMP to kernel and Hessian
+  call regularize_kernel(step_fac)
 
-  ! precond the kernel
-  do iker = 1, NKERNELS
-    if(iker == hess_idx) then
-      ! assign the invHess back
-      kernels_precond(:, :, :, :, iker) = invHess
-    else
-      kernels_precond(:, :, :, :, iker) = kernels(:, :, :, :, iker) * invHess
-    endif
-  enddo
-
-  call write_bp_file(kernels_precond, kernel_names, "KERNEL_GOURPS", output_file)
+  call write_bp_file(kernels_damp, kernel_names, "KERNEL_GOURPS", output_file)
 
   call adios_finalize(myrank, ier)
   call MPI_FINALIZE(ier)
