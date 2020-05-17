@@ -80,14 +80,16 @@ module regularize_kernels_sub
     ! H = H0 + step_fac
 
     real(kind=CUSTOM_REAL), intent(inout) :: step_fac
-    real(kind=CUSTOM_REAL):: maxh_all, step_len
+    real(kind=CUSTOM_REAL):: maxv_kl_all, maxv_all, step_len
 
     integer :: i, j, k, ispec
     real(kind=CUSTOM_REAL) :: alphav, alphah, betav, betah, eta, rho, bulk_c
     real(kind=CUSTOM_REAL) :: betav_kl, betah_kl, bulk_c_kl, eta_kl, rho_kl
 
-    call max_all_all_cr(maxval(kernels(:, :, :, :, hess_idx)), maxh_all)
-    step_len = maxh_all * step_fac
+    call max_all_all_cr(maxval(abs(kernels(:, :, :, :, betav_kl_idx))), maxv_kl_all)
+    call max_all_all_cr(maxval(abs(models(:, :, :, :, vsv_idx))), maxv_all)
+
+    step_len = maxh_all / maxv_all * step_fac
 
     if(myrank == 0) then
       write(*, *) "Regularization parameter: ", step_len
