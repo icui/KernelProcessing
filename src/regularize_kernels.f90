@@ -89,6 +89,10 @@ module regularize_kernels_sub
     call max_all_all_cr(maxval(kernels(:, :, :, :, hess_idx)), maxh_all)
     step_len = maxh_all * step_fac
 
+    if(myrank == 0) then
+      write(*, *) "Regularization parameter: ", step_len
+    endif
+
     kernels_damp(:, :, :, :, hess_idx) = kernels(:, :, :, :, hess_idx) + step_len
 
     do ispec = 1, NSPEC
