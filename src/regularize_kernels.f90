@@ -12,7 +12,7 @@ module regularize_kernels_sub
   use mpi
   use global, only : myrank, nprocs, NGLLX, NGLLY, NGLLZ, NSPEC, NGLOB, CUSTOM_REAL
   use AdiosIO
-  
+
   implicit none
 
   ! ======================================================
@@ -161,4 +161,4 @@ program regularize_kernels
   call adios_finalize(myrank, ier)
   call MPI_FINALIZE(ier)
 
-end program precond_kernels
+end program regularize_kernels
