@@ -20,7 +20,6 @@ module misfit_subs
 
   contains
   subroutine get_sys_args(ref_model_file, new_model_file, solver_file)
-    use global, only : myrank
     use global, only : exit_mpi
     implicit none
     character(len=500), intent(in) :: ref_model_file, new_model_file, solver_file
