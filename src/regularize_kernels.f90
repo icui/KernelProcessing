@@ -80,19 +80,18 @@ module regularize_kernels_sub
     ! H = H0 + step_fac
 
     real(kind=CUSTOM_REAL), intent(inout) :: step_fac
-    real(kind=CUSTOM_REAL):: maxv_kl_all, maxv_all, step_len
+    real(kind=CUSTOM_REAL):: maxh_all, step_len
 
     integer :: i, j, k, ispec
     real(kind=CUSTOM_REAL) :: alphav, alphah, betav, betah, eta, rho, bulk_c
     real(kind=CUSTOM_REAL) :: betav_kl, betah_kl, bulk_c_kl, eta_kl, rho_kl
 
-    call max_all_all_cr(maxval(abs(kernels(:, :, :, :, betav_kl_idx))), maxv_kl_all)
-    call max_all_all_cr(maxval(abs(models(:, :, :, :, vsv_idx))), maxv_all)
+    call max_all_all_cr(maxval(abs(kernels(:, :, :, :, hess_idx))), maxh_all)
 
-    step_len = maxv_kl_all / maxv_all * step_fac
+    step_len = maxh_all * step_fac
 
     if(myrank == 0) then
-      write(*, *) "Regularization parameter: ", step_len
+      write(*, *) "Regularization parameter:", step_len
     endif
 
     kernels_damp(:, :, :, :, hess_idx) = kernels(:, :, :, :, hess_idx) + step_len
@@ -121,7 +120,7 @@ module regularize_kernels_sub
             kernels_damp(i,j,k,ispec,betav_kl_idx) = betav_kl + step_len * betav
             kernels_damp(i,j,k,ispec,betah_kl_idx) = betah_kl + step_len * betah
             kernels_damp(i,j,k,ispec,bulk_c_kl_idx) = bulk_c_kl + step_len * bulk_c
-            kernels_damp(i,j,k,ispec,eta_kl_idx) = eta_kl + step_len * rho
+            kernels_damp(i,j,k,ispec,eta_kl_idx) = eta_kl + step_len * eta
             kernels_damp(i,j,k,ispec,rho_kl_idx) = rho_kl + step_len * rho
           enddo
         enddo

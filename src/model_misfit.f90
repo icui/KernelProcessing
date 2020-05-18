@@ -12,10 +12,6 @@ module misfit_subs
   real(kind=CUSTOM_REAL), dimension(NGLLX, NGLLY, NGLLZ, NSPEC, nvars) :: ref_model, &
                                                                           new_model
   ! 6 parameter perturbation + 5 extra perturbation
-  ! don't change the order unless you know what you are doing
-  character(len=500), dimension(6), parameter :: perturb_names = &
-    (/character(len=500) :: "reg1/dvpvvpv", "reg1/dvphvph", "reg1/dvsvvsv", &
-                            "reg1/dvshvsh", "reg1/detaeta", "reg1/drhorho"/)
   real(kind=CUSTOM_REAL), dimension(NGLLX, NGLLY, NGLLZ, NSPEC, nvars) :: perturb_model
 
   contains
@@ -29,7 +25,7 @@ module misfit_subs
     call getarg(3, solver_file)
 
     if(trim(ref_model_file) == '' .or. trim(new_model_file) == '') then
-      call exit_mpi('Usage: xmodel_perturbs ref_model_file new_model_file')
+      call exit_mpi('Usage: xmodel_misfit ref_model_file new_model_file solver_data')
     endif
 
   end subroutine get_sys_args
@@ -60,15 +56,20 @@ program main
                                   "verbose=1", ier)
 
   call read_bp_file_real(ref_model_file, model_names, ref_model)
-  call read_bp_file_real(new_model_file, model_names, new_model)
 
-  perturb_model = (new_model - ref_model)
+  if (trim(new_model_file) == '' == '_') then
+    perturb_model = ref_model
+  else
+    call read_bp_file_real(new_model_file, model_names, new_model)
+    perturb_model = (ref_model - new_model)
+  endif
+
   call calculate_jacobian_matrix(solver_file, jacobian)
   call Parallel_ComputeL2normSquare(perturb_model, 6, jacobian, model_misfit)
 
   call adios_finalize(myrank, ier)
   call MPI_FINALIZE(ier)
 
-  if(myrank == 0) print *, "model misfit:", model_misfit
+  if(myrank == 0) print *, "Model misfit:", model_misfit
 
 end program main
