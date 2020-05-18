@@ -57,7 +57,7 @@ program main
 
   call read_bp_file_real(ref_model_file, model_names, ref_model)
 
-  if (trim(new_model_file) == '' == '_') then
+  if (trim(new_model_file) == '_') then
     perturb_model = ref_model
   else
     call read_bp_file_real(new_model_file, model_names, new_model)
