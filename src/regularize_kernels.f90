@@ -67,7 +67,7 @@ module regularize_kernels_sub
       write(*, *) "Input kernel: ", trim(input_file)
       write(*, *) "Input model: ", trim(input_model)
       write(*, *) "Output kernel: ", trim(output_file)
-      write(*, *) "Regularization factor: ", step_fac
+      write(*, *) "Relative regularization factor: ", step_fac
     endif
 
   end subroutine get_sys_args
