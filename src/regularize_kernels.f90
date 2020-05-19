@@ -69,7 +69,7 @@ module regularize_kernels_sub
       write(*, *) "Input model: ", trim(input_model)
       write(*, *) "Output kernel: ", trim(output_file)
 
-      if (rel == 'rel') then
+      if (trim(rel) == 'rel') then
         write(*, *) "Relative regularization factor: ", step_fac
       else
         write(*, *) "Regularization factor: ", step_fac
@@ -97,14 +97,14 @@ module regularize_kernels_sub
     call max_all_all_cr(maxval(abs(kernels(:, :, :, :, betav_kl_idx))), maxv_kl_all)
     call max_all_all_cr(maxval(abs(models(:, :, :, :, vsv_idx))), maxv_all)
 
-    if (rel == 'rel') then
+    if (trim(rel) == 'rel') then
       step_len = maxv_kl_all / maxv_all * step_fac
     else
       step_len = step_fac
     endif
 
     if(myrank == 0) then
-      if (rel == 'rel') then
+      if (trim(rel) == 'rel') then
         write(*, *) "Regularization factor: ", step_len
       else
         write(*, *) "Relative bulk_betav kernel perturbation: ", maxv_all * step_fac / maxv_kl_all
