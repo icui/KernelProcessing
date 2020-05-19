@@ -46,8 +46,8 @@ module regularize_kernels_sub
 
   contains
 
-  subroutine get_sys_args(input_file, input_model, output_file, step_fac)
-    character(len=*), intent(inout) :: input_file, input_model, output_file
+  subroutine get_sys_args(input_file, input_model, output_file, step_fac, rel)
+    character(len=*), intent(inout) :: input_file, input_model, output_file, rel
     real(kind=CUSTOM_REAL), intent(inout) :: step_fac
 
     character(len=20) :: step_fac_str
@@ -56,6 +56,7 @@ module regularize_kernels_sub
     call getarg(2, input_model)
     call getarg(3, output_file)
     call getarg(4, step_fac_str)
+    call getarg(5, rel)
 
     read(step_fac_str, *) step_fac
 
@@ -67,18 +68,24 @@ module regularize_kernels_sub
       write(*, *) "Input kernel: ", trim(input_file)
       write(*, *) "Input model: ", trim(input_model)
       write(*, *) "Output kernel: ", trim(output_file)
-      write(*, *) "Relative regularization factor: ", step_fac
+
+      if (rel == 'rel') then
+        write(*, *) "Relative regularization factor: ", step_fac
+      else
+        write(*, *) "Regularization factor: ", step_fac
+      endif
     endif
 
   end subroutine get_sys_args
 
-  subroutine regularize_kernel(step_fac)
+  subroutine regularize_kernel(step_fac, rel)
     use global , only : FOUR_THIRDS
     ! DMP regularization:
     ! J = J0 + step_fac * ||m||^2
     ! K = K0 + step_fac * m
     ! H = H0 + step_fac
 
+    character(len=*), intent(inout) :: rel
     real(kind=CUSTOM_REAL), intent(inout) :: step_fac
     real(kind=CUSTOM_REAL):: maxv_kl_all, maxh_all, maxv_all, step_len
 
@@ -90,10 +97,18 @@ module regularize_kernels_sub
     call max_all_all_cr(maxval(abs(kernels(:, :, :, :, betav_kl_idx))), maxv_kl_all)
     call max_all_all_cr(maxval(abs(models(:, :, :, :, vsv_idx))), maxv_all)
 
-    step_len = maxv_kl_all / maxv_all * step_fac
+    if (rel == 'rel') then
+      step_len = maxv_kl_all / maxv_all * step_fac
+    else
+      step_len = step_fac
+    endif
 
     if(myrank == 0) then
-      write(*, *) "Regularization factor: ", step_len
+      if (rel == 'rel') then
+        write(*, *) "Regularization factor: ", step_len
+      else
+        write(*, *) "Relative bulk_betav kernel perturbation: ", maxv_all * step_fac / maxv_kl_all
+      endif
       write(*, *) "Relative Hessian perturbation: ", step_len / maxh_all
     endif
 
@@ -143,7 +158,7 @@ program regularize_kernels
 
   implicit none
 
-  character(len=500) :: input_file, input_model, output_file
+  character(len=500) :: input_file, input_model, output_file, rel
   real(kind=CUSTOM_REAL) :: step_fac
   integer:: ier
 
@@ -153,7 +168,7 @@ program regularize_kernels
     call exit_mpi("hess_idx is wrong!")
   endif
 
-  call get_sys_args(input_file, input_model, output_file, step_fac)
+  call get_sys_args(input_file, input_model, output_file, step_fac, rel)
 
   call adios_read_init_method(ADIOS_READ_METHOD_BP, MPI_COMM_WORLD, &
                               "verbose=1", ier)
@@ -162,7 +177,7 @@ program regularize_kernels
   call read_bp_file_real(input_model, model_names, models)
 
   ! apply DMP to kernel and Hessian
-  call regularize_kernel(step_fac)
+  call regularize_kernel(step_fac, rel)
 
   call write_bp_file(kernels_damp, kernel_names, "KERNEL_GOURPS", output_file)
 
