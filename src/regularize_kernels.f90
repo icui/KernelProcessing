@@ -54,8 +54,8 @@ module regularize_kernels_sub
 
     call getarg(1, input_file)
     call getarg(2, current_model)
-    call getarg(4, starting_model)
-    call getarg(3, output_file)
+    call getarg(3, starting_model)
+    call getarg(4, output_file)
     call getarg(5, step_fac_str)
     call getarg(6, mode)
 
