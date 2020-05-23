@@ -113,7 +113,7 @@ module regularize_kernels_sub
       if (trim(mode) == 'rel') then
         write(*, *) "Regularization factor: ", step_len
       else
-        write(*, *) "Relative bulk_betav kernel perturbation: ", maxv_all * step_fac / maxv_kl_all
+        write(*, *) "Relative regularization factor: ", maxv_all * step_fac / maxv_kl_all
       endif
       write(*, *) "Relative Hessian perturbation: ", step_len / maxh_all
     endif
