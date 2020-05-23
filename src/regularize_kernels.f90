@@ -71,8 +71,8 @@ module regularize_kernels_sub
 
     if(myrank == 0) then
       write(*, *) "Input kernel: ", trim(input_file)
-      write(*, *) "Input model: ", trim(input_model)
-      write(*, *) "Reference model: ", trim(ref_model)
+      write(*, *) "Input model: ", trim(current_model)
+      write(*, *) "Reference model: ", trim(starting_model)
       write(*, *) "Output kernel: ", trim(output_file)
 
       if (trim(mode) == 'rel') then
