@@ -47,7 +47,7 @@ module regularize_kernels_sub
   contains
 
   subroutine get_sys_args(input_file, current_model, starting_model, output_file, step_fac, mode)
-    character(len=*), intent(inout) :: input_file, current_model, starting_model, output_file, rel
+    character(len=*), intent(inout) :: input_file, current_model, starting_model, output_file, mode
     real(kind=CUSTOM_REAL), intent(inout) :: step_fac
 
     character(len=20) :: step_fac_str
@@ -187,7 +187,7 @@ program regularize_kernels
   models = models - models_ref
 
   ! apply DMP to kernel and Hessian
-  call regularize_kernel(step_fac, rel)
+  call regularize_kernel(step_fac, mode)
 
   call write_bp_file(kernels_damp, kernel_names, "KERNEL_GOURPS", output_file)
 
