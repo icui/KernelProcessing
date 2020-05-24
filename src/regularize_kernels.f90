@@ -98,6 +98,7 @@ module regularize_kernels_sub
 
     integer :: i, j, k, ispec
     real(kind=CUSTOM_REAL) :: alphav, alphah, betav, betah, eta, rho, bulk_c
+    real(kind=CUSTOM_REAL) :: alphav_ref, alphah_ref, betav_ref, betah_ref, eta_ref, rho_ref, bulk_c_ref
     real(kind=CUSTOM_REAL) :: betav_kl, betah_kl, bulk_c_kl, eta_kl, rho_kl
 
     call max_all_all_cr(maxval(abs(kernels(:, :, :, :, hess_idx))), maxh_all)
