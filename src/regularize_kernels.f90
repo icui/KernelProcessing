@@ -47,23 +47,23 @@ module regularize_kernels_sub
 
   contains
 
-  subroutine get_sys_args(input_file, current_model, starting_model, output_file, step_fac, mode)
-    character(len=*), intent(inout) :: input_file, current_model, starting_model, output_file, mode
+  subroutine get_sys_args(input_file, input_model, input_model_ref, output_file, step_fac, mode)
+    character(len=*), intent(inout) :: input_file, input_model, input_model_ref, output_file, mode
     real(kind=CUSTOM_REAL), intent(inout) :: step_fac
 
     character(len=20) :: step_fac_str
 
     call getarg(1, input_file)
-    call getarg(2, current_model)
-    call getarg(3, starting_model)
+    call getarg(2, input_model)
+    call getarg(3, input_model_ref)
     call getarg(4, output_file)
     call getarg(5, step_fac_str)
     call getarg(6, mode)
 
     read(step_fac_str, *) step_fac
 
-    if(input_file == '' .or. current_model == '' .or. starting_model == '' .or. step_fac_str == '') then
-      call exit_mpi("Usage: xregularize_kernels input_kernel current_model starting_model output_kernel step_fac mode")
+    if(input_file == '' .or. input_model == '' .or. input_model_ref == '' .or. step_fac_str == '') then
+      call exit_mpi("Usage: xregularize_kernels input_kernel input_model input_model_ref output_kernel step_fac mode")
     endif
 
     if (mode .ne. 'rel' .and. mode .ne. 'abs') then
@@ -72,8 +72,8 @@ module regularize_kernels_sub
 
     if(myrank == 0) then
       write(*, *) "Input kernel: ", trim(input_file)
-      write(*, *) "Input model: ", trim(current_model)
-      write(*, *) "Reference model: ", trim(starting_model)
+      write(*, *) "Input model: ", trim(input_model)
+      write(*, *) "Reference model: ", trim(input_model_ref)
       write(*, *) "Output kernel: ", trim(output_file)
 
       if (trim(mode) == 'rel') then
@@ -174,7 +174,7 @@ program regularize_kernels
 
   implicit none
 
-  character(len=500) :: input_file, current_model, starting_model, output_file, mode
+  character(len=500) :: input_file, input_model, input_model_ref, output_file, mode
   real(kind=CUSTOM_REAL) :: step_fac
   integer:: ier
 
@@ -184,14 +184,14 @@ program regularize_kernels
     call exit_mpi("hess_idx is wrong!")
   endif
 
-  call get_sys_args(input_file, current_model, starting_model, output_file, step_fac, mode)
+  call get_sys_args(input_file, input_model, input_model_ref, output_file, step_fac, mode)
 
   call adios_read_init_method(ADIOS_READ_METHOD_BP, MPI_COMM_WORLD, &
                               "verbose=1", ier)
 
   call read_bp_file_real(input_file, kernel_names, kernels)
-  call read_bp_file_real(current_model, model_names, models)
-  call read_bp_file_real(starting_model, model_names, models_ref)
+  call read_bp_file_real(input_model, model_names, models)
+  call read_bp_file_real(input_model_ref, model_names, models_ref)
 
   ! apply DMP to kernel and Hessian
   call regularize_kernel(step_fac, mode)
