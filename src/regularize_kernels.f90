@@ -29,6 +29,7 @@ module regularize_kernels_sub
                             "reg1/dvshvsh","reg1/detaeta","reg1/drhorho"/)
   ! transverse isotropic model files
   real(kind=CUSTOM_REAL), dimension(NGLLX,NGLLY,NGLLZ,NSPEC,NMODELS) :: models = 0.0
+  real(kind=CUSTOM_REAL), dimension(NGLLX,NGLLY,NGLLZ,NSPEC,NMODELS) :: models_ref = 0.0
 
   ! ======================================================
   ! KERNELS
@@ -101,7 +102,7 @@ module regularize_kernels_sub
 
     call max_all_all_cr(maxval(abs(kernels(:, :, :, :, hess_idx))), maxh_all)
     call max_all_all_cr(maxval(abs(kernels(:, :, :, :, betav_kl_idx))), maxv_kl_all)
-    call max_all_all_cr(maxval(abs(models(:, :, :, :, vsv_idx))), maxv_all)
+    call max_all_all_cr(maxval(abs(models_ref(:, :, :, :, vsv_idx))), maxv_all)
 
     if (trim(mode) == 'rel') then
       step_len = maxv_kl_all / maxv_all * step_fac
@@ -133,6 +134,14 @@ module regularize_kernels_sub
             rho    = models(i,j,k,ispec,rho_idx)
             bulk_c = sqrt(alphav ** 2 - FOUR_THIRDS * betav ** 2)
 
+            alphav_ref = models_ref(i,j,k,ispec,vpv_idx)
+            alphah_ref = models_ref(i,j,k,ispec,vph_idx)
+            betav_ref  = models_ref(i,j,k,ispec,vsv_idx)
+            betah_ref  = models_ref(i,j,k,ispec,vsh_idx)
+            eta_ref    = models_ref(i,j,k,ispec,eta_idx)
+            rho_ref    = models_ref(i,j,k,ispec,rho_idx)
+            bulk_c_ref = sqrt(alphav_ref ** 2 - FOUR_THIRDS * betav_ref ** 2)
+
             ! initial kernel values
             betav_kl  = kernels(i,j,k,ispec,betav_kl_idx)
             betah_kl  = kernels(i,j,k,ispec,betah_kl_idx)
@@ -141,11 +150,11 @@ module regularize_kernels_sub
             rho_kl    = kernels(i,j,k,ispec,rho_kl_idx)
 
             ! regularized kernel values
-            kernels_damp(i,j,k,ispec,betav_kl_idx) = betav_kl + step_len * betav
-            kernels_damp(i,j,k,ispec,betah_kl_idx) = betah_kl + step_len * betah
-            kernels_damp(i,j,k,ispec,bulk_c_kl_idx) = bulk_c_kl + step_len * bulk_c
-            kernels_damp(i,j,k,ispec,eta_kl_idx) = eta_kl + step_len * eta
-            kernels_damp(i,j,k,ispec,rho_kl_idx) = rho_kl + step_len * rho
+            kernels_damp(i,j,k,ispec,betav_kl_idx) = betav_kl + step_len * (betav - betav_ref)
+            kernels_damp(i,j,k,ispec,betah_kl_idx) = betah_kl + step_len * (betah - betah_ref)
+            kernels_damp(i,j,k,ispec,bulk_c_kl_idx) = bulk_c_kl + step_len * (bulk_c - bulk_c_ref)
+            kernels_damp(i,j,k,ispec,eta_kl_idx) = eta_kl + step_len * (eta - eta_ref)
+            kernels_damp(i,j,k,ispec,rho_kl_idx) = rho_kl + step_len * (rho - rho_ref)
           enddo
         enddo
       enddo
@@ -167,7 +176,6 @@ program regularize_kernels
   character(len=500) :: input_file, current_model, starting_model, output_file, mode
   real(kind=CUSTOM_REAL) :: step_fac
   integer:: ier
-  real(kind=CUSTOM_REAL), dimension(NGLLX,NGLLY,NGLLZ,NSPEC,NMODELS) :: models_ref = 0.0
 
   call init_mpi()
 
@@ -183,8 +191,6 @@ program regularize_kernels
   call read_bp_file_real(input_file, kernel_names, kernels)
   call read_bp_file_real(current_model, model_names, models)
   call read_bp_file_real(starting_model, model_names, models_ref)
-
-  models = models - models_ref
 
   ! apply DMP to kernel and Hessian
   call regularize_kernel(step_fac, mode)
