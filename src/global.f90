@@ -70,7 +70,6 @@ module global
     real(kind=CUSTOM_REAL)  :: qp_tmp_single
     integer :: ier
 
-    qp_tmp=0._CUSTOM_REAL
     ntotal = NSPEC * NGLLX * NGLLY * NGLLZ
 
     call max_all_all_cr(maxval(arr), upper)
