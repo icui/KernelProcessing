@@ -57,7 +57,6 @@ module precond_kernels_sub
 
     if (myrank==0) then
       write(*, *) "Max and Min of hess: ", maxh_all, minh_all
-      write(*, *) 'Threshold cutoff: ', cutoff
     endif
 
     ! normalized hess
@@ -69,10 +68,11 @@ module precond_kernels_sub
     if (myrank==0) then
       write(*, *) 'min and max hess after norm', minh_all, maxh_all
       write(*, *) "Hessian Threshold: ", threshold
+      write(*, *) 'Threshold cutoff: ', cutoff
     endif
 
-    where(hess > threshold )
-      invHess = 1.0_CUSTOM_REAL / hess
+    where(hess > cutoff )
+      invHess = 1.0_CUSTOM_REAL / cutoff
     elsewhere
       invHess = 1.0_CUSTOM_REAL / threshold
     endwhere
