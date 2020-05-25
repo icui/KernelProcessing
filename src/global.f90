@@ -103,7 +103,9 @@ module global
         upper = q
       endif
 
-      print *, iloop, nall, ntotal, nall / ntotal
+      if (myrank .eq. 0) then
+        print *, iloop, nall, ntotal, nall / ntotal
+      endif
 
     enddo
 
