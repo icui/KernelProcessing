@@ -74,7 +74,7 @@ module global
     call max_all_all_cr(maxval(arr), upper)
     call min_all_all_cr(maxval(arr), lower)
 
-    do iloop=1, 10
+    do iloop=1, 100
       q = (upper + lower) / 2
       n = 0.
       nall=0.
