@@ -69,7 +69,7 @@ module global
     real(kind=CUSTOM_REAL) :: perc, n, nall, ntotal, upper, lower, n_tmp
     integer :: i, j, k, ispec, iloop
 
-    ntotal = NSPEC * NGLLX * NGLLY * NGLLZ
+    ntotal = NSPEC * NGLLX * NGLLY * NGLLZ * nprocs
 
     call max_all_all_cr(maxval(arr), upper)
     call min_all_all_cr(minval(arr), lower)
