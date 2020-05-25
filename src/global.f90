@@ -74,7 +74,7 @@ module global
     call max_all_all_cr(maxval(arr), upper)
     call min_all_all_cr(minval(arr), lower)
 
-    do iloop=1, 100
+    do iloop=1, 50
       q = (upper + lower) / 2
       n = 0.
       nall=0.
@@ -101,10 +101,6 @@ module global
 
       if (nall .ge. perc * ntotal) then
         upper = q
-      endif
-
-      if (myrank .eq. 0) then
-        print *, iloop, lower, q, upper, nall / ntotal
       endif
 
     enddo
