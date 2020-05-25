@@ -44,7 +44,7 @@ module precond_kernels_sub
     real(CUSTOM_REAL), dimension(:, :, :, :), intent(inout) :: hess, invHess
     real(CUSTOM_REAL), intent(in) :: threshold
 
-    real(kind=CUSTOM_REAL):: maxh_all, minh_all
+    real(kind=CUSTOM_REAL):: maxh_all, minh_all, cutoff
 
     call max_all_all_cr(maxval(hess), maxh_all)
     call min_all_all_cr(minval(hess), minh_all)
@@ -53,9 +53,11 @@ module precond_kernels_sub
       call exit_mpi("hess max value < 1.e-18")
     end if
 
+    call quantile_all_all_cr(hess, threshold, cutoff)
+
     if (myrank==0) then
       write(*, *) "Max and Min of hess: ", maxh_all, minh_all
-      write(*, *) 'Normalize factor(max hess) for all processors ', maxh_all
+      write(*, *) 'Threshold cutoff: ', cutoff
     endif
 
     ! normalized hess

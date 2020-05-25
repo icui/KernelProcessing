@@ -65,9 +65,8 @@ module global
 
   subroutine quantile_all_all_cr(arr, perc, q)
     real(kind=CUSTOM_REAL), dimension(:, :, :, :), intent(in) :: arr
-    real intent(inout) :: q
-    real :: perc, n, nall, ntotal, upper, lower
-    real(kind=CUSTOM_REAL)  :: qp_tmp_single
+    real(kind=CUSTOM_REAL), intent(inout) :: q
+    real(kind=CUSTOM_REAL) :: perc, n, nall, ntotal, upper, lower, n_tmp
     integer :: ier, i, j, k, ispec, iglob, iloop
 
     ntotal = NSPEC * NGLLX * NGLLY * NGLLZ
@@ -93,8 +92,8 @@ module global
       enddo
 
 
-      qp_tmp_single = REAL(n, CUSTOM_REAL)
-      call sum_all_all_cr(qp_tmp_single, nall)
+      n_tmp = REAL(n, CUSTOM_REAL)
+      call sum_all_all_cr(n_tmp, nall)
 
       if (nall .le. perc * ntotal) then
         lower = q
