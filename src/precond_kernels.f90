@@ -71,9 +71,9 @@ module precond_kernels_sub
     endif
 
     where(hess > cutoff )
-      invHess = 1.0_CUSTOM_REAL / cutoff
+      invHess = 1.0_CUSTOM_REAL / hess
     elsewhere
-      invHess = 1.0_CUSTOM_REAL / threshold
+      invHess = 1.0_CUSTOM_REAL / cutoff
     endwhere
   end subroutine prepare_hessian
 
