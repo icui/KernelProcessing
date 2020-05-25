@@ -72,7 +72,7 @@ module global
     ntotal = NSPEC * NGLLX * NGLLY * NGLLZ
 
     call max_all_all_cr(maxval(arr), upper)
-    call min_all_all_cr(maxval(arr), lower)
+    call min_all_all_cr(minval(arr), lower)
 
     do iloop=1, 10
       q = (upper + lower) / 2
