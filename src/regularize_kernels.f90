@@ -47,8 +47,8 @@ module regularize_kernels_sub
 
   contains
 
-  subroutine get_sys_args(input_file, input_model, input_model_ref, output_file, step_fac, mode)
-    character(len=*), intent(inout) :: input_file, input_model, input_model_ref, output_file, mode
+  subroutine get_sys_args(input_file, input_model, input_model_ref, output_file, step_fac)
+    character(len=*), intent(inout) :: input_file, input_model, input_model_ref, output_file
     real(kind=CUSTOM_REAL), intent(inout) :: step_fac
 
     character(len=20) :: step_fac_str
@@ -58,16 +58,11 @@ module regularize_kernels_sub
     call getarg(3, input_model_ref)
     call getarg(4, output_file)
     call getarg(5, step_fac_str)
-    call getarg(6, mode)
 
     read(step_fac_str, *) step_fac
 
     if(input_file == '' .or. input_model == '' .or. input_model_ref == '' .or. step_fac_str == '') then
-      call exit_mpi("Usage: xregularize_kernels input_kernel input_model input_model_ref output_kernel step_fac mode")
-    endif
-
-    if (mode .ne. 'rel' .and. mode .ne. 'abs') then
-      call exit_mpi("Mode should be `rel` or `abs`.")
+      call exit_mpi("Usage: xregularize_kernels input_kernel input_model input_model_ref output_kernel step_fac")
     endif
 
     if(myrank == 0) then
@@ -75,24 +70,18 @@ module regularize_kernels_sub
       write(*, *) "Input model: ", trim(input_model)
       write(*, *) "Reference model: ", trim(input_model_ref)
       write(*, *) "Output kernel: ", trim(output_file)
-
-      if (trim(mode) == 'rel') then
-        write(*, *) "Relative regularization factor: ", step_fac
-      else
-        write(*, *) "Regularization factor: ", step_fac
-      endif
+      write(*, *) "Relative regularization factor: ", step_fac
     endif
 
   end subroutine get_sys_args
 
-  subroutine regularize_kernel(step_fac, mode)
+  subroutine regularize_kernel(step_fac)
     use global , only : FOUR_THIRDS
     ! DMP regularization:
     ! J = J0 + step_fac * ||m||^2
     ! K = K0 + step_fac * m
     ! H = H0 + step_fac
 
-    character(len=*), intent(inout) :: mode
     real(kind=CUSTOM_REAL), intent(inout) :: step_fac
     real(kind=CUSTOM_REAL):: maxv_kl_all, maxh_all, maxv_all, step_len
 
@@ -103,24 +92,21 @@ module regularize_kernels_sub
 
     call max_all_all_cr(maxval(abs(kernels(:, :, :, :, hess_idx))), maxh_all)
     call max_all_all_cr(maxval(abs(kernels(:, :, :, :, betav_kl_idx))), maxv_kl_all)
-    call max_all_all_cr(maxval(abs(models_ref(:, :, :, :, vsv_idx))), maxv_all)
+    call max_all_all_cr(maxval(abs(models(:, :, :, :, vsv_idx) - models_ref(:, :, :, :, vsv_idx))), maxv_all)
 
-    if (trim(mode) == 'rel') then
+    if (maxv_all .le. maxv_kl_all * step_fac) then
+      step_len = 1.0
+    else  
       step_len = maxv_kl_all / maxv_all * step_fac
-    else
-      step_len = step_fac
     endif
 
     if(myrank == 0) then
-      if (trim(mode) == 'rel') then
-        write(*, *) "Regularization factor: ", step_len
-      else
-        write(*, *) "Relative regularization factor: ", maxv_all * step_fac / maxv_kl_all
-      endif
-      write(*, *) "Relative Hessian perturbation: ", step_len / maxh_all
+      write(*, *) "Regularization factor: ", step_len
+      write(*, *) "Relative vsv kernel perturbation: ", maxv_all * step_fac / maxv_kl_all
+      ! write(*, *) "Relative Hessian perturbation: ", step_len / maxh_all
     endif
 
-    kernels_damp(:, :, :, :, hess_idx) = kernels(:, :, :, :, hess_idx) + step_len
+    ! kernels_damp(:, :, :, :, hess_idx) = kernels(:, :, :, :, hess_idx) + step_len
 
     do ispec = 1, NSPEC
       do k = 1, NGLLZ
@@ -174,7 +160,7 @@ program regularize_kernels
 
   implicit none
 
-  character(len=500) :: input_file, input_model, input_model_ref, output_file, mode
+  character(len=500) :: input_file, input_model, input_model_ref, output_file
   real(kind=CUSTOM_REAL) :: step_fac
   integer:: ier
 
@@ -184,7 +170,7 @@ program regularize_kernels
     call exit_mpi("hess_idx is wrong!")
   endif
 
-  call get_sys_args(input_file, input_model, input_model_ref, output_file, step_fac, mode)
+  call get_sys_args(input_file, input_model, input_model_ref, output_file, step_fac)
 
   call adios_read_init_method(ADIOS_READ_METHOD_BP, MPI_COMM_WORLD, &
                               "verbose=1", ier)
@@ -194,7 +180,7 @@ program regularize_kernels
   call read_bp_file_real(input_model_ref, model_names, models_ref)
 
   ! apply DMP to kernel and Hessian
-  call regularize_kernel(step_fac, mode)
+  call regularize_kernel(step_fac)
 
   call write_bp_file(kernels_damp, kernel_names, "KERNEL_GOURPS", output_file)
 

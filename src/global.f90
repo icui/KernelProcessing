@@ -63,6 +63,54 @@ module global
 
   end subroutine min_all_all_cr
 
+  subroutine quantile_all_all_cr(arr, perc, q)
+    real(kind=CUSTOM_REAL), dimension(:, :, :, :), intent(in) :: arr
+    real intent(inout) :: q
+    real :: perc, n, nall, ntotal, upper, lower
+    real(kind=CUSTOM_REAL)  :: qp_tmp_single
+    integer :: ier
+
+    qp_tmp=0._CUSTOM_REAL
+    ntotal = NSPEC * NGLLX * NGLLY * NGLLZ
+
+    call max_all_all_cr(maxval(arr), upper)
+    call min_all_all_cr(maxval(arr), lower)
+
+    do iloop=1, 10
+      q = (upper + lower) / 2
+      n = 0.
+      nall=0.
+
+      do ispec = 1, NSPEC
+        do k=1,NGLLZ
+          do j=1,NGLLY
+            do i=1,NGLLX
+              if (arr(i, j, k, ispec) .le. q) then
+                n = n + 1.
+              endif
+            enddo
+          enddo
+        enddo
+      enddo
+
+
+      qp_tmp_single = REAL(n, CUSTOM_REAL)
+      call sum_all_all_cr(qp_tmp_single, nall)
+
+      if (nall .le. perc * ntotal) then
+        lower = q
+      endif
+
+      if (nall .ge. perc * ntotal) then
+        upper = q
+      endif
+
+      print *, iloop, nall, ntotal, nall / ntotal
+
+    enddo
+
+  end subroutine
+
   subroutine build_jacobian(ibool, xix, xiy, xiz, etax, etay, etaz, &
                             gammax, gammay, gammaz, jacobian)
   integer, dimension(:, :, :, :), intent(in) :: ibool

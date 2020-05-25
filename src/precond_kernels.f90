@@ -116,7 +116,7 @@ program precond_kernels
 
   call read_bp_file_real(input_file, kernel_names, kernels)
 
-  hess = kernels(:, :, :, :, hess_idx)
+  hess = abs(kernels(:, :, :, :, hess_idx))
   call prepare_hessian(hess, threshold_hess, invHess)
 
   ! precond the kernel
