@@ -104,7 +104,7 @@ module global
       endif
 
       if (myrank .eq. 0) then
-        print *, iloop, nall, ntotal, nall / ntotal
+        print *, iloop, nall, ntotal, nall / ntotal, perc
       endif
 
     enddo
