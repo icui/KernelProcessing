@@ -66,8 +66,8 @@ module precond_kernels_sub
 
     if (myrank==0) then
       write(*, *) 'min and max hess after norm', minh_all, maxh_all
-      write(*, *) "Hessian Threshold: ", threshold
-      write(*, *) 'Threshold cutoff: ', cutoff
+      write(*, *) "Hessian Threshold quantile: ", threshold
+      write(*, *) 'Hessian Threshold: ', cutoff
     endif
 
     where(hess > cutoff )
