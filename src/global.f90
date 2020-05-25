@@ -68,7 +68,7 @@ module global
     real intent(inout) :: q
     real :: perc, n, nall, ntotal, upper, lower
     real(kind=CUSTOM_REAL)  :: qp_tmp_single
-    integer :: ier
+    integer :: ier, i, j, k, ispec, iglob
 
     ntotal = NSPEC * NGLLX * NGLLY * NGLLZ
 
