@@ -51,9 +51,7 @@ module precond_kernels_sub
 
     if ( maxh_all < 1.e-18 ) then
       call exit_mpi("hess max value < 1.e-18")
-    end if
-
-    call quantile_all_all_cr(hess, threshold, cutoff)
+    endif
 
     if (myrank==0) then
       write(*, *) "Max and Min of hess: ", maxh_all, minh_all
@@ -62,6 +60,7 @@ module precond_kernels_sub
     ! normalized hess
     hess = hess / maxh_all
 
+    call quantile_all_all_cr(hess, threshold, cutoff)
     call max_all_all_cr(maxval(hess), maxh_all)
     call min_all_all_cr(minval(hess), minh_all)
 
