@@ -106,7 +106,7 @@ module regularize_kernels_sub
       ! write(*, *) "Relative Hessian perturbation: ", step_len / maxh_all
     endif
 
-    ! kernels_damp(:, :, :, :, hess_idx) = kernels(:, :, :, :, hess_idx) + step_len
+    kernels_damp(:, :, :, :, hess_idx) = kernels(:, :, :, :, hess_idx)
 
     do ispec = 1, NSPEC
       do k = 1, NGLLZ
