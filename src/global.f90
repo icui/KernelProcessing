@@ -67,7 +67,7 @@ module global
     real(kind=CUSTOM_REAL), dimension(:, :, :, :), intent(in) :: arr
     real(kind=CUSTOM_REAL), intent(inout) :: q
     real(kind=CUSTOM_REAL) :: perc, n, nall, ntotal, upper, lower, n_tmp
-    integer :: ier, i, j, k, ispec, iglob, iloop
+    integer :: i, j, k, ispec, iglob, iloop
 
     ntotal = NSPEC * NGLLX * NGLLY * NGLLZ
 

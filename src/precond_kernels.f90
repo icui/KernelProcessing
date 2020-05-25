@@ -11,7 +11,7 @@
 module precond_kernels_sub
   use mpi
   use global, only : max_all_all_cr, min_all_all_cr, CUSTOM_REAL, exit_mpi, &
-                     myrank
+                     myrank, quantile_all_all_cr
   implicit none
 
   contains
