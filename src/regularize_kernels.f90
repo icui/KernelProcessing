@@ -102,7 +102,7 @@ module regularize_kernels_sub
 
     if(myrank == 0) then
       write(*, *) "Regularization factor: ", step_len
-      write(*, *) "Relative vsv kernel perturbation: ", maxv_all * step_fac / maxv_kl_all
+      write(*, *) "Relative vsv kernel perturbation: ", maxv_all * step_len / maxv_kl_all
       ! write(*, *) "Relative Hessian perturbation: ", step_len / maxh_all
     endif
 
