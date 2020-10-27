@@ -96,7 +96,7 @@ program precond_kernels
                             "bulk_betav_kl_crust_mantle", "bulk_c_kl_crust_mantle", &
                             "eta_kl_crust_mantle", "rho_kl_crust_mantle"/)
   character(len=500), parameter :: kernel_names2(1) = &
-    (/character(len=500) :: "hess_kl_crust_mantle"
+    (/character(len=500) :: "hess_kl_crust_mantle"/)
   integer, parameter :: hess_idx = 1
 
   real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC):: hess = 0.0, invHess = 0.0
