@@ -92,12 +92,11 @@ program precond_kernels
 
   integer, parameter :: NKERNELS = 6    !bulk_betah, bulk_betav, bulk_c, eta
   character(len=500), parameter :: kernel_names(NKERNELS) = &
-    (/character(len=500) :: "hess_kl_crust_mantle", "bulk_betah_kl_crust_mantle", &
+    (/character(len=500) :: "bulk_betah_kl_crust_mantle", &
                             "bulk_betav_kl_crust_mantle", "bulk_c_kl_crust_mantle", &
                             "eta_kl_crust_mantle", "rho_kl_crust_mantle"/)
   character(len=500), parameter :: kernel_names2(1) = &
     (/character(len=500) :: "hess_kl_crust_mantle"/)
-  integer, parameter :: hess_idx = 1
 
   real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC):: hess = 0.0, invHess = 0.0
   real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC, NKERNELS):: kernels = 0.0, &
@@ -109,10 +108,6 @@ real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC, 1):: kernels2 = 0.0
   integer:: ier, iker
 
   call init_mpi()
-
-  if(trim(kernel_names(hess_idx)) /= "hess_kl_crust_mantle") then
-    call exit_mpi("hess_idx is wrong!")
-  endif
 
   call get_sys_args(input_file, input_file2, output_file, threshold_hess)
 
