@@ -122,7 +122,7 @@ real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC, 1):: kernels2 = 0.0
 
   ! precond the kernel
   do iker = 1, NKERNELS
-    if(iker == hess_idx) then
+    if(iker == 6) then
       ! assign the invHess back
       kernels_precond(:, :, :, :, iker) = invHess
     else
