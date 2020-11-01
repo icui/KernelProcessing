@@ -131,7 +131,7 @@ real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC, 1):: kernels2 = 0.0
       ! assign the invHess back
       kernels_precond(:, :, :, :, iker) = invHess
     else
-      kernels_precond(:, :, :, :, iker) = kernels(:, :, :, :, iker) * hess
+      kernels_precond(:, :, :, :, iker) = kernels(:, :, :, :, iker) * invHess
     endif
   enddo
 
