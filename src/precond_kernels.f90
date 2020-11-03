@@ -134,7 +134,6 @@ real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC, 1):: kernels2 = 0.0
       kernels_precond(:, :, :, :, iker) = kernels(:, :, :, :, iker) * invHess
     endif
   enddo
-  print *, invHess
 
   call write_bp_file(kernels_precond, kernel_names, "KERNEL_GOURPS", output_file)
 
