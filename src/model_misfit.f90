@@ -68,7 +68,7 @@ program main
   perturb_model = perturb_model * sponge
 
   call calculate_jacobian_matrix(solver_file, jacobian)
-  call Parallel_ComputeL2normSquare(perturb_model, 6, jacobian, sponge)
+  call Parallel_ComputeL2normSquare(sponge, 6, jacobian, model_misfit)
 
   call adios_finalize(myrank, ier)
   call MPI_FINALIZE(ier)
