@@ -2,7 +2,7 @@ module misfit_subs
   use global, only : CUSTOM_REAL, NGLLX, NGLLY, NGLLZ, NSPEC, myrank, init_mpi
   implicit none
 
-  integer, parameter :: nvars = 6
+  integer, parameter :: nvars = 1
   character(len=500), dimension(nvars), parameter :: model_names = &
     (/character(len=500) :: "reg1/dvsvvsv"/)
   integer, parameter :: vpv_idx = 1, vph_idx = 2, vsv_idx = 3, &
