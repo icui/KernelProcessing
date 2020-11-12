@@ -5,6 +5,8 @@ module misfit_subs
   integer, parameter :: nvars = 1
   character(len=500), dimension(nvars), parameter :: model_names = &
     (/character(len=500) :: "reg1/dvsvvsv"/)
+  character(len=500), dimension(nvars), parameter :: sponge_names = &
+    (/character(len=500) :: "reg1/spongestore"/)
 
   real(kind=CUSTOM_REAL), dimension(NGLLX, NGLLY, NGLLZ, NSPEC, nvars) :: ref_model, &
                                                                           new_model, &
@@ -62,7 +64,7 @@ program main
     perturb_model = (ref_model - new_model)
   endif
 
-  call read_bp_file_real(new_model_file, "reg1/spongestore", sponge)
+  call read_bp_file_real(new_model_file, sponge_names, sponge)
   perturb_model = perturb_model * sponge(:,:,:,:,1)
 
   call calculate_jacobian_matrix(solver_file, jacobian)
