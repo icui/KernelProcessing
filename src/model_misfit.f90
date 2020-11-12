@@ -5,11 +5,10 @@ module misfit_subs
   integer, parameter :: nvars = 1
   character(len=500), dimension(nvars), parameter :: model_names = &
     (/character(len=500) :: "reg1/dvsvvsv"/)
-  integer, parameter :: vpv_idx = 1, vph_idx = 2, vsv_idx = 3, &
-                        vsh_idx = 4, eta_idx = 5, rho_idx = 6
 
   real(kind=CUSTOM_REAL), dimension(NGLLX, NGLLY, NGLLZ, NSPEC, nvars) :: ref_model, &
-                                                                          new_model
+                                                                          new_model, &
+                                                                          sponge
   ! 6 parameter perturbation + 5 extra perturbation
   real(kind=CUSTOM_REAL), dimension(NGLLX, NGLLY, NGLLZ, NSPEC, nvars) :: perturb_model
 
@@ -43,7 +42,7 @@ program main
 
   character(len=500) :: ref_model_file, new_model_file, solver_file
   real(kind=CUSTOM_REAL) :: model_misfit
-  real(kind=CUSTOM_REAL), dimension(NGLLX, NGLLY, NGLLZ, NSPEC) :: jacobian, sponge
+  real(kind=CUSTOM_REAL), dimension(NGLLX, NGLLY, NGLLZ, NSPEC) :: jacobian
 
   integer :: ier
 
@@ -64,7 +63,7 @@ program main
   endif
 
   call read_bp_file_real(new_model_file, "reg1/spongestore", sponge)
-  perturb_model = perturb_model * sponge
+  perturb_model = perturb_model * sponge(:,:,:,:,1)
 
   call calculate_jacobian_matrix(solver_file, jacobian)
   call Parallel_ComputeL2normSquare(perturb_model, 6, jacobian, model_misfit)
