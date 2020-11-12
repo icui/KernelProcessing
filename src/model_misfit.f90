@@ -4,8 +4,7 @@ module misfit_subs
 
   integer, parameter :: nvars = 6
   character(len=500), dimension(nvars), parameter :: model_names = &
-    (/character(len=500) :: "reg1/vpv", "reg1/vph", "reg1/vsv", &
-                            "reg1/vsh", "reg1/eta", "reg1/rho"/)
+    (/character(len=500) :: "reg1/vsv"/)
   integer, parameter :: vpv_idx = 1, vph_idx = 2, vsv_idx = 3, &
                         vsh_idx = 4, eta_idx = 5, rho_idx = 6
 
