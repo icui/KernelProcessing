@@ -56,7 +56,7 @@ program main
                                   "verbose=1", ier)
 
   call read_bp_file_real(ref_model_file, model_names, ref_model)
-  print *, trim(new_model_file), trim(new_model_file) == '_'
+
   if (trim(new_model_file) == '_') then
     perturb_model = ref_model
   else
@@ -64,7 +64,7 @@ program main
     perturb_model = (ref_model - new_model)
   endif
 
-  call read_bp_file_real(new_model_file, sponge_names, sponge)
+  call read_bp_file_real(solver_file, sponge_names, sponge)
   perturb_model = perturb_model * sponge
 
   call calculate_jacobian_matrix(solver_file, jacobian)
