@@ -65,7 +65,7 @@ program main
   endif
 
   call read_bp_file_real(new_model_file, sponge_names, sponge)
-  perturb_model = perturb_model * sponge(:,:,:,:,1)
+  perturb_model = perturb_model * sponge
 
   call calculate_jacobian_matrix(solver_file, jacobian)
   call Parallel_ComputeL2normSquare(perturb_model, 6, jacobian, model_misfit)
