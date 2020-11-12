@@ -43,7 +43,7 @@ program main
 
   character(len=500) :: ref_model_file, new_model_file, solver_file
   real(kind=CUSTOM_REAL) :: model_misfit
-  real(kind=CUSTOM_REAL), dimension(NGLLX, NGLLY, NGLLZ, NSPEC) :: jacobian
+  real(kind=CUSTOM_REAL), dimension(NGLLX, NGLLY, NGLLZ, NSPEC) :: jacobian, sponge
 
   integer :: ier
 
@@ -62,6 +62,9 @@ program main
     call read_bp_file_real(new_model_file, model_names, new_model)
     perturb_model = (ref_model - new_model)
   endif
+
+  call read_bp_file_real(new_model_file, "reg1/spongestore", sponge)
+  perturb_model = perturb_model * sponge
 
   call calculate_jacobian_matrix(solver_file, jacobian)
   call Parallel_ComputeL2normSquare(perturb_model, 6, jacobian, model_misfit)
