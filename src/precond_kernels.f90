@@ -30,7 +30,7 @@ module precond_kernels_sub
 
     read(threshold_str, *) threshold_hess
 
-    if(input_file == '' .or. output_file == '') then
+    if(input_kernel == '' .or. input_hess == '' .or. output_file == '') then
       call exit_mpi("Usage: xprecond_kernels input_kernel input_hess input_model output_kernel threshold_hess")
     endif
 
