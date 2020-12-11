@@ -106,6 +106,7 @@ program precond_kernels
   real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC, 3):: hess = 0.0
   real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC, 5):: kernels = 0.0, kernels_precond = 0.0, hess_out = 0.0
   real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC, 3):: models = 0.0
+  real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC):: kappa, mu, hess_inv
   real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC):: hess_kappa, hess_mu, hess_rho, hess_vp, hess_vs, hess_eta
 
   character(len=500) :: input_kernel, input_hess, input_model, output_kernel
