@@ -134,18 +134,18 @@ program precond_kernels
   hess_eta = hess_kappa + 4.0 / 9.0 * hess_mu
 
   call prepare_hessian(hess_vs, threshold_hess, hess_inv)
-  kernels_precond(:, :, :, :, 1) = kernels(:, :, :, :, iker) * hess_inv
-  kernels_precond(:, :, :, :, 2) = kernels(:, :, :, :, iker) * hess_inv
+  kernels_precond(:, :, :, :, 1) = hess_inv
+  kernels_precond(:, :, :, :, 2) = hess_inv
 
   call prepare_hessian(hess_vp, threshold_hess, hess_inv)
-  kernels_precond(:, :, :, :, 3) = kernels(:, :, :, :, iker) * hess_inv
+  kernels_precond(:, :, :, :, 3) = hess_inv
 
 
   call prepare_hessian(hess_eta, threshold_hess, hess_inv)
-  kernels_precond(:, :, :, :, 4) = kernels(:, :, :, :, iker) * hess_inv
+  kernels_precond(:, :, :, :, 4) = hess_inv
 
   call prepare_hessian(hess_rho, threshold_hess, hess_inv)
-  kernels_precond(:, :, :, :, 5) = kernels(:, :, :, :, iker) * hess_inv
+  kernels_precond(:, :, :, :, 5) = hess_inv
 
   call write_bp_file(kernels_precond, kernel_names, "KERNEL_GOURPS", output_kernel)
 
