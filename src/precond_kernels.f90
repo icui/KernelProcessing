@@ -134,8 +134,8 @@ program precond_kernels
   hess_eta = hess_kappa + 4.0 / 9.0 * hess_mu
 
   call prepare_hessian(hess_vs, threshold_hess, hess_inv)
-  kernels_precond(:, :, :, :, 1) = hess_vs
-  kernels_precond(:, :, :, :, 2) = hess_vs
+  kernels_precond(:, :, :, :, 1) = hess_inv
+  kernels_precond(:, :, :, :, 2) = hess_inv
 
   call prepare_hessian(hess_vp, threshold_hess, hess_inv)
   kernels_precond(:, :, :, :, 3) = kernels(:, :, :, :, 3) * hess_inv
