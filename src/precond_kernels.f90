@@ -62,7 +62,7 @@ module precond_kernels_sub
     endif
 
     ! normalized hess
-    hess = hess / maxh_all
+    hess = abs(hess) / maxh_all
 
     call quantile_all_all_cr(hess, threshold, cutoff)
     call max_all_all_cr(maxval(hess), maxh_all)
@@ -134,8 +134,8 @@ program precond_kernels
   hess_eta = hess_kappa + 4.0 / 9.0 * hess_mu
 
   call prepare_hessian(hess_vs, threshold_hess, hess_inv)
-  kernels_precond(:, :, :, :, 1) = hess_vs
-  kernels_precond(:, :, :, :, 2) = hess_vs
+  kernels_precond(:, :, :, :, 1) = kernels(:, :, :, :, 1) * hess_inv
+  kernels_precond(:, :, :, :, 2) = kernels(:, :, :, :, 2) * hess_inv
 
   call prepare_hessian(hess_vp, threshold_hess, hess_inv)
   kernels_precond(:, :, :, :, 3) = kernels(:, :, :, :, 3) * hess_inv
