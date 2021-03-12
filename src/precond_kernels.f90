@@ -52,7 +52,8 @@ program precond_kernels
                             "bulk_c_kl_crust_mantle", "eta_kl_crust_mantle", "rho_kl_crust_mantle"/)
 
   character(len=500), parameter :: hess_names(4) = &
-    (/character(len=500) :: "invhess_vs_crust_mantle", "invhess_vp_crust_mantle", "invhess_eta_crust_mantle", "invhess_rho_crust_mantle"/)
+    (/character(len=500) :: "invhess_vs_crust_mantle", "invhess_vp_crust_mantle", "invhess_eta_crust_mantle", &
+                            "invhess_rho_crust_mantle"/)
 
   real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC, 3):: hess = 0.0
   real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC, 5):: kernels = 0.0, kernels_precond = 0.0
