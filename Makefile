@@ -92,7 +92,7 @@ $(BINDIR)/xmodel_perturb_ref: $(OBJDIR)/model_perturb_ref.o $(objects)
 $(BINDIR)/xmodel_misfit: $(OBJDIR)/model_misfit.o $(objects)
 	$(MPIFC) $(FCFLAGS) -o $@ $^ $(adios_link) $(adios_inc)
 
-$(BINDIR)/inverse_hessian: $(OBJDIR)/inverse_hessian.o $(objects)
+$(BINDIR)/xinverse_hessian: $(OBJDIR)/inverse_hessian.o $(objects)
 	$(MPIFC) $(FCFLAGS) -o $@ $^ $(adios_link) $(adios_inc)
 
 $(BINDIR)/xregularize_kernels: $(OBJDIR)/regularize_kernels.o $(objects)
