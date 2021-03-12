@@ -95,8 +95,8 @@ program inverse_hessian
     (/character(len=500) :: "hess_kappa_kl_crust_mantle", "hess_mu_kl_crust_mantle", "hess_rho_kl_crust_mantle"/)
 
   character(len=500), parameter :: invhess_names(4) = &
-    (/character(len=500) :: "invhess_vs_crust_mantle", "invhess_vp_crust_mantle", "invhess_eta_crust_mantle", &
-                            "invhess_rho_crust_mantle"/)
+    (/character(len=500) :: "invhess_vs_kl_crust_mantle", "invhess_vp_kl_crust_mantle", "invhess_eta_kl_crust_mantle", &
+                            "invhess_rho_kl_crust_mantle"/)
 
   character(len=500), parameter :: model_names(3) = &
     (/character(len=500) :: "reg1/kappavstore", "reg1/muvstore", "reg1/muhstore"/)

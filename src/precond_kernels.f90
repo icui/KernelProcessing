@@ -51,11 +51,11 @@ program precond_kernels
     (/character(len=500) :: "bulk_betah_kl_crust_mantle", "bulk_betav_kl_crust_mantle", &
                             "bulk_c_kl_crust_mantle", "eta_kl_crust_mantle", "rho_kl_crust_mantle"/)
 
-  character(len=500), parameter :: hess_names(4) = &
-    (/character(len=500) :: "invhess_vs_crust_mantle", "invhess_vp_crust_mantle", "invhess_eta_crust_mantle", &
-                            "invhess_rho_crust_mantle"/)
+  character(len=500), parameter :: invhess_names(4) = &
+    (/character(len=500) :: "invhess_vs_kl_crust_mantle", "invhess_vp_kl_crust_mantle", "invhess_eta_kl_crust_mantle", &
+                            "invhess_rho_kl_crust_mantle"/)
 
-  real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC, 3):: hess = 0.0
+  real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC, 3):: invhess = 0.0
   real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC, 5):: kernels = 0.0, kernels_precond = 0.0
 
   character(len=500) :: input_kernel, input_hess, output_kernel
@@ -67,20 +67,20 @@ program precond_kernels
   call adios_read_init_method(ADIOS_READ_METHOD_BP, MPI_COMM_WORLD, "verbose=1", ier)
 
   call read_bp_file_real(input_kernel, kernel_names, kernels)
-  call read_bp_file_real(input_hess, hess_names, hess)
+  call read_bp_file_real(input_hess, invhess_names, hess)
 
   ! betah, betav / vs
-  kernels_precond(:, :, :, :, 1) = kernels(:, :, :, :, 1) * hess(:, :, :, :, 1)
-  kernels_precond(:, :, :, :, 2) = kernels(:, :, :, :, 2) * hess(:, :, :, :, 1)
+  kernels_precond(:, :, :, :, 1) = kernels(:, :, :, :, 1) * invhess(:, :, :, :, 1)
+  kernels_precond(:, :, :, :, 2) = kernels(:, :, :, :, 2) * invhess(:, :, :, :, 1)
 
   ! bulkc / vp
-  kernels_precond(:, :, :, :, 3) = kernels(:, :, :, :, 3) * hess(:, :, :, :, 2)
+  kernels_precond(:, :, :, :, 3) = kernels(:, :, :, :, 3) * invhess(:, :, :, :, 2)
   
   ! eta
-  kernels_precond(:, :, :, :, 4) = kernels(:, :, :, :, 4) * hess(:, :, :, :, 3)
+  kernels_precond(:, :, :, :, 4) = kernels(:, :, :, :, 4) * invhess(:, :, :, :, 3)
 
   ! rho
-  kernels_precond(:, :, :, :, 5) = kernels(:, :, :, :, 5) * hess(:, :, :, :, 4)
+  kernels_precond(:, :, :, :, 5) = kernels(:, :, :, :, 5) * invhess(:, :, :, :, 4)
 
   call write_bp_file(kernels_precond, kernel_names, "KERNEL_GOURPS", output_kernel)
 
