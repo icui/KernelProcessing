@@ -17,7 +17,7 @@ module precond_kernels_sub
   contains
 
   subroutine get_sys_args(input_kernel, input_hess, output_kernel)
-    character(len=*), intent(inout) :: input_kernel, input_hess, input_model, output_kernel
+    character(len=*), intent(inout) :: input_kernel, input_hess, output_kernel
 
     call getarg(1, input_kernel)
     call getarg(2, input_hess)
