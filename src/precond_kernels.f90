@@ -67,7 +67,7 @@ program precond_kernels
   call adios_read_init_method(ADIOS_READ_METHOD_BP, MPI_COMM_WORLD, "verbose=1", ier)
 
   call read_bp_file_real(input_kernel, kernel_names, kernels)
-  call read_bp_file_real(input_hess, invhess_names, hess)
+  call read_bp_file_real(input_hess, invhess_names, invhess)
 
   ! betah, betav / vs
   kernels_precond(:, :, :, :, 1) = kernels(:, :, :, :, 1) * invhess(:, :, :, :, 1)
