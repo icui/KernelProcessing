@@ -50,6 +50,9 @@ $(OBJDIR)/model_perturb_ref.o: $(SRCDIR)/model_perturb_ref.f90  $(objects)
 $(OBJDIR)/model_misfit.o: $(SRCDIR)/model_misfit.f90  $(objects)
 	$(MPIFC) $(FCFLAGS) -c $< -o $@ $(adios_inc)
 
+$(OBJDIR)/inverse_hessian.o: $(SRCDIR)/inverse_hessian.f90  $(objects)
+	$(MPIFC) $(FCFLAGS) -c $< -o $@ $(adios_inc)
+
 $(OBJDIR)/regularize_kernels.o: $(SRCDIR)/regularize_kernels.f90  $(objects)
 	$(MPIFC) $(FCFLAGS) -c $< -o $@ $(adios_inc)
 
@@ -87,6 +90,9 @@ $(BINDIR)/xmodel_perturb_ref: $(OBJDIR)/model_perturb_ref.o $(objects)
 	$(MPIFC) $(FCFLAGS) -o $@ $^ $(adios_link) $(adios_inc)
 
 $(BINDIR)/xmodel_misfit: $(OBJDIR)/model_misfit.o $(objects)
+	$(MPIFC) $(FCFLAGS) -o $@ $^ $(adios_link) $(adios_inc)
+
+$(BINDIR)/inverse_hessian: $(OBJDIR)/inverse_hessian.o $(objects)
 	$(MPIFC) $(FCFLAGS) -o $@ $^ $(adios_link) $(adios_inc)
 
 $(BINDIR)/xregularize_kernels: $(OBJDIR)/regularize_kernels.o $(objects)
