@@ -103,6 +103,7 @@ program inverse_hessian
 
   real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC, 3):: hess = 0.0, models = 0.0
   real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC, 4):: invhess
+  real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC):: kappa, mu
   real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC):: hess_kappa, hess_mu, hess_rho, hess_vp, hess_vs, hess_eta
 
   character(len=500) :: input_hess, input_model, output_hess
