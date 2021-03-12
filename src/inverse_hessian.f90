@@ -17,7 +17,7 @@ module inverse_hessian_sub
   contains
 
   subroutine get_sys_args(input_hess, input_model, output_hess, threshold_hess)
-    character(len=*), intent(inout) :: input_kernel, input_hess, input_model, output_hess
+    character(len=*), intent(inout) :: input_hess, input_model, output_hess
     real(kind=CUSTOM_REAL), intent(inout) :: threshold_hess
 
     character(len=20) :: threshold_str
