@@ -21,7 +21,7 @@ module precond_kernels_sub
 
     call getarg(1, input_kernel)
     call getarg(2, input_hess)
-    call getarg(4, output_kernel)
+    call getarg(3, output_kernel)
 
     if(input_kernel == '' .or. input_hess == '' .or. output_kernel == '') then
       call exit_mpi("Usage: xprecond_kernels input_kernel input_hess output_kernel")
