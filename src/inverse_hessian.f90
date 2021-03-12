@@ -81,7 +81,7 @@ module inverse_hessian_sub
 
 end module inverse_hessian_sub
 
-program precond_kernels
+program inverse_hessian
   use mpi
   use adios_read_mod
   use AdiosIO
@@ -144,4 +144,4 @@ program precond_kernels
   call adios_finalize(myrank, ier)
   call MPI_FINALIZE(ier)
 
-end program precond_kernels
+end program inverse_hessian
