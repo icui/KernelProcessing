@@ -12,7 +12,7 @@ adios_inc=$(shell /ccs/home/ccui/adios-gcc/build/bin/adios_config -cf)
 
 objects= $(OBJDIR)/adios_helpers_definitions.o $(OBJDIR)/adios_helpers_writers.o $(OBJDIR)/adios_helpers.o $(OBJDIR)/gll_library.o $(OBJDIR)/global.o $(OBJDIR)/AdiosIO.o
 
-all: $(BINDIR)/xsteepDescent $(BINDIR)/xcg_direction $(BINDIR)/xlbfgs $(BINDIR)/xsum_kernels $(BINDIR)/xprecond_kernels $(BINDIR)/xmerge_kernels $(BINDIR)/xupdate_model $(BINDIR)/xmodel_perturb_ref $(BINDIR)/xmodel_misfit $(BINDIR)/xregularize_kernels $(BINDIR)/xgauss_psf $(BINDIR)/xblend_model
+all: $(BINDIR)/xsteepDescent $(BINDIR)/xcg_direction $(BINDIR)/xlbfgs $(BINDIR)/xsum_kernels $(BINDIR)/xprecond_kernels $(BINDIR)/xmerge_kernels $(BINDIR)/xupdate_model $(BINDIR)/xmodel_perturb_ref $(BINDIR)/xmodel_misfit $(BINDIR)/xinverse_hessian $(BINDIR)/xregularize_kernels $(BINDIR)/xgauss_psf $(BINDIR)/xblend_model
 
 $(OBJDIR)/global.o: $(SRCDIR)/global.f90 $(OBJDIR)/gll_library.o
 	$(MPIFC) $(FCFLAGS) -c $< -o $@
