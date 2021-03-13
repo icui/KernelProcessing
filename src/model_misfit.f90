@@ -59,8 +59,8 @@ program main
                                   "verbose=1", ier)
 
 
-  if (trim(new_model_file) == '_') then
-    call read_bp_file_real(ref_model_file, model_names, ref_model)
+  if (trim(ref_model_file) == '_') then
+    call read_bp_file_real(new_model_file, model_names, ref_model)
     perturb_model = ref_model
   else
     call read_bp_file_real(ref_model_file, model_names2, ref_model)
