@@ -17,7 +17,7 @@ module misfit_subs
   real(kind=CUSTOM_REAL), dimension(NGLLX, NGLLY, NGLLZ, NSPEC, nvars) :: perturb_model
 
   contains
-  subroutine get_sys_args(ref_model_file, new_model_file, solver_file)
+  subroutine get_sys_args(ref_model_file, new_model_file, solver_file, sponge_file)
     use global, only : exit_mpi
     implicit none
     character(len=500), intent(in) :: ref_model_file, new_model_file, solver_file
@@ -25,6 +25,7 @@ module misfit_subs
     call getarg(1, ref_model_file)
     call getarg(2, new_model_file)
     call getarg(3, solver_file)
+    call getarg(4, sponge_file)
 
     if(trim(ref_model_file) == '' .or. trim(new_model_file) == '') then
       call exit_mpi('Usage: xmodel_misfit ref_model_file new_model_file solver_data')
@@ -44,7 +45,7 @@ program main
   use misfit_subs
   implicit none
 
-  character(len=500) :: ref_model_file, new_model_file, solver_file
+  character(len=500) :: ref_model_file, new_model_file, solver_file, sponge_file
   real(kind=CUSTOM_REAL) :: model_misfit
   real(kind=CUSTOM_REAL), dimension(NGLLX, NGLLY, NGLLZ, NSPEC) :: jacobian
 
@@ -52,7 +53,7 @@ program main
 
   call init_mpi()
 
-  call get_sys_args(ref_model_file, new_model_file, solver_file)
+  call get_sys_args(ref_model_file, new_model_file, solver_file, sponge_file)
  
   call adios_read_init_method(ADIOS_READ_METHOD_BP, MPI_COMM_WORLD, &
                                   "verbose=1", ier)
@@ -67,7 +68,7 @@ program main
     perturb_model = (ref_model - new_model)
   endif
 
-  call read_bp_file_real(solver_file, sponge_names, sponge)
+  call read_bp_file_real(sponge_file, sponge_names, sponge)
   perturb_model = perturb_model * sponge
 
   call calculate_jacobian_matrix(solver_file, jacobian)
