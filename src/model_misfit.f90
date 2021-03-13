@@ -4,6 +4,8 @@ module misfit_subs
 
   integer, parameter :: nvars = 1
   character(len=500), dimension(nvars), parameter :: model_names = &
+    (/character(len=500) :: "reg1/dvsvvsv"/)
+  character(len=500), dimension(nvars), parameter :: model_names2 = &
     (/character(len=500) :: "reg1/vsv"/)
   character(len=500), dimension(nvars), parameter :: sponge_names = &
     (/character(len=500) :: "reg1/spongestore"/)
@@ -61,8 +63,8 @@ program main
     call read_bp_file_real(ref_model_file, model_names, ref_model)
     perturb_model = ref_model
   else
-    call read_bp_file_real(ref_model_file, model_names, ref_model)
-    call read_bp_file_real(new_model_file, model_names, new_model)
+    call read_bp_file_real(ref_model_file, model_names2, ref_model)
+    call read_bp_file_real(new_model_file, model_names2, new_model)
     perturb_model = (ref_model - new_model)
   endif
 
