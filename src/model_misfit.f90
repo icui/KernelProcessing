@@ -20,7 +20,7 @@ module misfit_subs
   subroutine get_sys_args(ref_model_file, new_model_file, solver_file, sponge_file)
     use global, only : exit_mpi
     implicit none
-    character(len=500), intent(in) :: ref_model_file, new_model_file, solver_file
+    character(len=500), intent(in) :: ref_model_file, new_model_file, solver_file, sponge_file
 
     call getarg(1, ref_model_file)
     call getarg(2, new_model_file)
