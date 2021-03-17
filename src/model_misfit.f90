@@ -4,7 +4,7 @@ module misfit_subs
 
   integer, parameter :: nvars = 1
   character(len=500), dimension(nvars), parameter :: model_names = &
-    (/character(len=500) :: "dvsvvsv"/)
+    (/character(len=500) :: "reg1/dvsvvsv"/)
   character(len=500), dimension(nvars), parameter :: model_names2 = &
     (/character(len=500) :: "reg1/vsv"/)
   character(len=500), dimension(nvars), parameter :: sponge_names = &
