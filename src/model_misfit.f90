@@ -4,7 +4,7 @@ module misfit_subs
 
   integer, parameter :: nvars = 1
   character(len=500), dimension(nvars), parameter :: model_names = &
-    (/character(len=500) :: "bulk_betah_kl_crust_mantle"/)
+    (/character(len=500) :: "dvsvvsv"/)
   character(len=500), dimension(nvars), parameter :: model_names2 = &
     (/character(len=500) :: "reg1/vsv"/)
   character(len=500), dimension(nvars), parameter :: sponge_names = &
@@ -74,7 +74,7 @@ program main
   call calculate_jacobian_matrix(solver_file, jacobian)
   call Parallel_ComputeL2normSquare(perturb_model, 1, jacobian, model_misfit)
 
-  ! call write_bp_file(perturb_model, model_names, "KERNELS_GROUP", "sp.bp")
+  call write_bp_file(perturb_model, model_names, "KERNELS_GROUP", "sp.bp")
 
   call adios_finalize(myrank, ier)
   call MPI_FINALIZE(ier)
