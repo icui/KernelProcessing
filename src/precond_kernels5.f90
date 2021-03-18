@@ -16,14 +16,15 @@ module precond_kernels_sub
 
   contains
 
-  subroutine get_sys_args(input_kernel, input_hess, output_kernel, threshold_hess)
-    character(len=*), intent(inout) :: input_kernel, input_hess, output_kernel
+  subroutine get_sys_args(input_kernel, input_hess, input_model, output_kernel, threshold_hess)
+    character(len=*), intent(inout) :: input_kernel, input_hess, input_model, output_kernel
     real(kind=CUSTOM_REAL), intent(inout) :: threshold_hess
 
     character(len=20) :: threshold_str
 
     call getarg(1, input_kernel)
     call getarg(2, input_hess)
+    call getarg(3, input_model)
     call getarg(4, output_kernel)
     call getarg(5, threshold_str)
 
@@ -36,6 +37,7 @@ module precond_kernels_sub
     if(myrank == 0) then
       write(*, *) "Input kernel: ", trim(input_kernel)
       write(*, *) "Input hessian: ", trim(input_hess)
+      write(*, *) "Input model: ", trim(input_model)
       write(*, *) "Output kernel: ", trim(output_kernel)
       write(*, *) "Threshold hessian: ", threshold_hess
     endif
@@ -92,38 +94,54 @@ program precond_kernels
     (/character(len=500) :: "bulk_betah_kl_crust_mantle", "bulk_betav_kl_crust_mantle", &
                             "bulk_c_kl_crust_mantle", "eta_kl_crust_mantle", "rho_kl_crust_mantle"/)
 
-  character(len=500), parameter :: hess_names(4) = &
-    (/character(len=500) :: "hess_vs_kl_crust_mantle", "hess_vp_kl_crust_mantle", "hess_eta_kl_crust_mantle", &
-                            "hess_rho_kl_crust_mantle"/)
+  character(len=500), parameter :: hess_names(3) = &
+    (/character(len=500) :: "hess_kappa_kl_crust_mantle", "hess_mu_kl_crust_mantle", "hess_rho_kl_crust_mantle"/)
+
+  character(len=500), parameter :: model_names(3) = &
+    (/character(len=500) :: "reg1/kappavstore", "reg1/muvstore", "reg1/muhstore"/)
 
   real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC, 3):: hess = 0.0
   real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC, 5):: kernels = 0.0, kernels_precond = 0.0, hess_out = 0.0
-  real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC):: hess_inv
+  real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC, 3):: models = 0.0
+  real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC):: kappa, mu, hess_inv
+  real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC):: hess_kappa, hess_mu, hess_rho, hess_vp, hess_vs, hess_eta
 
-  character(len=500) :: input_kernel, input_hess, output_kernel
+  character(len=500) :: input_kernel, input_hess, input_model, output_kernel
   real(kind=CUSTOM_REAL) :: threshold_hess
   integer:: ier
 
   call init_mpi()
 
-  call get_sys_args(input_kernel, input_hess, output_kernel, threshold_hess)
+  call get_sys_args(input_kernel, input_hess, input_model, output_kernel, threshold_hess)
   call adios_read_init_method(ADIOS_READ_METHOD_BP, MPI_COMM_WORLD, "verbose=1", ier)
 
   call read_bp_file_real(input_kernel, kernel_names, kernels)
   call read_bp_file_real(input_hess, hess_names, hess)
+  call read_bp_file_real(input_model, model_names, models)
 
-  call prepare_hessian(hess(:, :, :, :, 1), threshold_hess, hess_inv)
+  kappa = models(:, :, :, :, 1)
+  mu = sqrt((2.0*models(:, :, :, :, 2)**2 + models(:, :, :, :, 3)**2) / 3.0)
+
+  hess_kappa = hess(:, :, :, :, 1)
+  hess_mu = hess(:, :, :, :, 2)
+  hess_rho = hess(:, :, :, :, 3)
+  
+  hess_vp = 4.0 * (1.0 + 4.0/3.0*(mu/kappa))**2 * hess_kappa
+  hess_vs = 4.0 * hess_mu + 64.0 / 9.0 * (mu/kappa)**2 * hess_kappa
+  hess_eta = hess_kappa + 4.0 / 9.0 * hess_mu
+
+  call prepare_hessian(hess_vs, threshold_hess, hess_inv)
   kernels_precond(:, :, :, :, 1) = kernels(:, :, :, :, 1) * hess_inv
   kernels_precond(:, :, :, :, 2) = kernels(:, :, :, :, 2) * hess_inv
 
-  call prepare_hessian(hess(:, :, :, :, 2), threshold_hess, hess_inv)
+  call prepare_hessian(hess_vp, threshold_hess, hess_inv)
   kernels_precond(:, :, :, :, 3) = kernels(:, :, :, :, 3) * hess_inv
 
 
-  call prepare_hessian(hess(:, :, :, :, 3), threshold_hess, hess_inv)
+  call prepare_hessian(hess_eta, threshold_hess, hess_inv)
   kernels_precond(:, :, :, :, 4) = kernels(:, :, :, :, 4) * hess_inv
 
-  call prepare_hessian(hess(:, :, :, :, 4), threshold_hess, hess_inv)
+  call prepare_hessian(hess_rho, threshold_hess, hess_inv)
   kernels_precond(:, :, :, :, 5) = kernels(:, :, :, :, 5) * hess_inv
 
   call write_bp_file(kernels_precond, kernel_names, "KERNEL_GOURPS", output_kernel)
