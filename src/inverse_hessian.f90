@@ -61,7 +61,7 @@ module inverse_hessian_sub
     endif
 
     ! normalized hess
-    damp = maxh_all * threshold
+    damp = maxh_all / (threshold - 1)
     hess = (hess + damp) / (maxh_all + damp)
     
     call max_all_all_cr(maxval(hess), maxh_all)
@@ -73,7 +73,7 @@ module inverse_hessian_sub
     endif
 
     hess_inv = 1.0_CUSTOM_REAL / hess
-    
+
   end subroutine prepare_hessian
 
 end module inverse_hessian_sub
