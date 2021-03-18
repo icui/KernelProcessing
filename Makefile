@@ -12,7 +12,7 @@ adios_inc=$(shell /ccs/home/ccui/adios-gcc/build/bin/adios_config -cf)
 
 objects= $(OBJDIR)/adios_helpers_definitions.o $(OBJDIR)/adios_helpers_writers.o $(OBJDIR)/adios_helpers.o $(OBJDIR)/gll_library.o $(OBJDIR)/global.o $(OBJDIR)/AdiosIO.o
 
-all: $(BINDIR)/xsteepDescent $(BINDIR)/xcg_direction $(BINDIR)/xlbfgs $(BINDIR)/xsum_kernels $(BINDIR)/xprecond_kernels $(BINDIR)/xmerge_kernels $(BINDIR)/xupdate_model $(BINDIR)/xmodel_perturb_ref $(BINDIR)/xmodel_misfit $(BINDIR)/xconvert_hessian $(BINDIR)/xregularize_kernels $(BINDIR)/xgauss_psf $(BINDIR)/xblend_model
+all: $(BINDIR)/xsteepDescent $(BINDIR)/xcg_direction $(BINDIR)/xlbfgs $(BINDIR)/xsum_kernels $(BINDIR)/xprecond_kernels $(BINDIR)/xmerge_kernels $(BINDIR)/xupdate_model $(BINDIR)/xmodel_perturb_ref $(BINDIR)/xmodel_misfit $(BINDIR)/xinverse_hessian $(BINDIR)/xregularize_kernels $(BINDIR)/xgauss_psf $(BINDIR)/xblend_model
 
 $(OBJDIR)/global.o: $(SRCDIR)/global.f90 $(OBJDIR)/gll_library.o
 	$(MPIFC) $(FCFLAGS) -c $< -o $@
@@ -50,7 +50,7 @@ $(OBJDIR)/model_perturb_ref.o: $(SRCDIR)/model_perturb_ref.f90  $(objects)
 $(OBJDIR)/model_misfit.o: $(SRCDIR)/model_misfit.f90  $(objects)
 	$(MPIFC) $(FCFLAGS) -c $< -o $@ $(adios_inc)
 
-$(OBJDIR)/convert_hessian.o: $(SRCDIR)/convert_hessian.f90  $(objects)
+$(OBJDIR)/inverse_hessian.o: $(SRCDIR)/inverse_hessian.f90  $(objects)
 	$(MPIFC) $(FCFLAGS) -c $< -o $@ $(adios_inc)
 
 $(OBJDIR)/regularize_kernels.o: $(SRCDIR)/regularize_kernels.f90  $(objects)
@@ -92,7 +92,7 @@ $(BINDIR)/xmodel_perturb_ref: $(OBJDIR)/model_perturb_ref.o $(objects)
 $(BINDIR)/xmodel_misfit: $(OBJDIR)/model_misfit.o $(objects)
 	$(MPIFC) $(FCFLAGS) -o $@ $^ $(adios_link) $(adios_inc)
 
-$(BINDIR)/xconvert_hessian: $(OBJDIR)/convert_hessian.o $(objects)
+$(BINDIR)/xinverse_hessian: $(OBJDIR)/inverse_hessian.o $(objects)
 	$(MPIFC) $(FCFLAGS) -o $@ $^ $(adios_link) $(adios_inc)
 
 $(BINDIR)/xregularize_kernels: $(OBJDIR)/regularize_kernels.o $(objects)
