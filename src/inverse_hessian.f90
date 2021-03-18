@@ -48,6 +48,12 @@ module inverse_hessian_sub
 
     real(kind=CUSTOM_REAL):: maxh_all, minh_all, cutoff
 
+    real(CUSTOM_REAL), dimension(:, :, :, :), intent(inout) :: hess, hess_inv
+    real(CUSTOM_REAL), intent(in) :: threshold
+
+    real(kind=CUSTOM_REAL):: maxh_all, minh_all, damp
+
+    hess = abs(hess)
     call max_all_all_cr(maxval(hess), maxh_all)
     call min_all_all_cr(minval(hess), minh_all)
 
@@ -60,23 +66,19 @@ module inverse_hessian_sub
     endif
 
     ! normalized hess
-    hess = abs(hess) / maxh_all
-
-    call quantile_all_all_cr(hess, threshold, cutoff)
+    damp = maxh_all * threshold
+    hess = (hess + damp) / (maxh_all + damp)
+    
     call max_all_all_cr(maxval(hess), maxh_all)
     call min_all_all_cr(minval(hess), minh_all)
 
     if (myrank==0) then
       write(*, *) 'min and max hess after norm', minh_all, maxh_all
-      write(*, *) "Hessian Threshold quantile: ", threshold
-      write(*, *) 'Hessian Threshold: ', cutoff
+      write(*, *) "Hessian condition number: ", threshold
     endif
 
-    where(hess > cutoff )
-      hess_inv = 1.0_CUSTOM_REAL / hess
-    elsewhere
-      hess_inv = 1.0_CUSTOM_REAL / cutoff
-    endwhere
+    hess_inv = 1.0_CUSTOM_REAL / hess
+    
   end subroutine prepare_hessian
 
 end module inverse_hessian_sub
