@@ -17,7 +17,7 @@ module convert_hessian_sub
   contains
 
   subroutine get_sys_args(input_hess, input_model, output_hess)
-    character(len=*), intent(inout) :: input_hess, input_model
+    character(len=*), intent(inout) :: input_hess, input_model, output_hess
 
     call getarg(1, input_hess)
     call getarg(2, input_model)
