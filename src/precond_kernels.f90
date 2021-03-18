@@ -113,18 +113,18 @@ program precond_kernels
   call read_bp_file_real(input_hess, hess_names, hess)
 
   call prepare_hessian(hess(:, :, :, :, 1), threshold_hess, hess_inv)
-  kernels_precond(:, :, :, :, 1) = kernels(:, :, :, :, 1) * hess_inv
-  kernels_precond(:, :, :, :, 2) = kernels(:, :, :, :, 2) * hess_inv
+  kernels_precond(:, :, :, :, 1) = hess_inv
+  kernels_precond(:, :, :, :, 2) = hess_inv
 
   call prepare_hessian(hess(:, :, :, :, 2), threshold_hess, hess_inv)
-  kernels_precond(:, :, :, :, 3) = kernels(:, :, :, :, 3) * hess_inv
+  kernels_precond(:, :, :, :, 3) = hess_inv
 
 
   call prepare_hessian(hess(:, :, :, :, 3), threshold_hess, hess_inv)
-  kernels_precond(:, :, :, :, 4) = kernels(:, :, :, :, 4) * hess_inv
+  kernels_precond(:, :, :, :, 4) = hess_inv
 
   call prepare_hessian(hess(:, :, :, :, 4), threshold_hess, hess_inv)
-  kernels_precond(:, :, :, :, 5) = kernels(:, :, :, :, 5) * hess_inv
+  kernels_precond(:, :, :, :, 5) = hess_inv
 
   call write_bp_file(kernels_precond, kernel_names, "KERNEL_GOURPS", output_kernel)
 
