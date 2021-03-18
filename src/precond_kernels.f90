@@ -48,7 +48,7 @@ module precond_kernels_sub
     real(CUSTOM_REAL), dimension(:, :, :, :), intent(inout) :: hess, hess_inv
     real(CUSTOM_REAL), intent(in) :: threshold
 
-    real(kind=CUSTOM_REAL):: maxh_all, minh_all, cutoff
+    real(kind=CUSTOM_REAL):: maxh_all, minh_all, damp
 
     hess = abs(hess)
     call max_all_all_cr(maxval(hess), maxh_all)
