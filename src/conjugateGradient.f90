@@ -83,10 +83,10 @@ module ConjugateGradient
     call Parallel_ComputeL2normSquare(gradient_1, nkernels, jacobian, orth_down)
     orth = abs(orth_up / orth_down)
     if(myrank == 0) write(*, *) "Orthogonal coef: ", orth
-    if (orth > 0.1) then
-      if (myrank == 0) write(*, *) "Beta change by restart condition(Orth<0.1): ", beta, "-> 0.0"
-      beta = 0.0
-    endif
+    ! if (orth > 0.1) then
+    !   if (myrank == 0) write(*, *) "Beta change by restart condition(Orth<0.1): ", beta, "-> 0.0"
+    !   beta = 0.0
+    ! endif
   end subroutine get_beta
 
   subroutine compute_search_direction(gradient_0, gradient_1, gradient_1c, direction_0, &
