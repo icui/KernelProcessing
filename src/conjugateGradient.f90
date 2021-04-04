@@ -122,10 +122,10 @@ subroutine get_sys_args(grad_0_file, grad_1_file, grad_1c_file, &
 
   call getarg(1, grad_0_file)
   call getarg(2, grad_1_file)
-  call getarg(2, grad_1c_file)
-  call getarg(3, direction_0_file)
-  call getarg(4, solver_file)
-  call getarg(5, direction_1_file)
+  call getarg(3 grad_1c_file)
+  call getarg(4, direction_0_file)
+  call getarg(5, solver_file)
+  call getarg(6, direction_1_file)
 
   if(trim(grad_0_file) == '' .or. trim(grad_1_file) == '' &
      .or. trim(grad_1c_file) == '' &
