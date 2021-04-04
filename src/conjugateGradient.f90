@@ -52,9 +52,9 @@ module ConjugateGradient
     endif
   end subroutine get_beta_old
 
-  subroutine get_beta(gradient_0, gradient_1, gradient_1c, jacobian, beta)
+  subroutine get_beta(gradient_0, gradient_0c, gradient_1, gradient_1c, jacobian, beta)
     real(kind=CUSTOM_REAL),dimension(:, :, :, :, :), intent(in):: gradient_0, gradient_1
-    real(kind=CUSTOM_REAL),dimension(:, :, :, :, :), intent(in):: gradient_1c
+    real(kind=CUSTOM_REAL),dimension(:, :, :, :, :), intent(in):: gradient_0c, gradient_1c
     real(kind=CUSTOM_REAL),dimension(:, :, :, :), intent(in):: jacobian
     real(kind=CUSTOM_REAL), intent(inout) :: beta
 
@@ -65,9 +65,10 @@ module ConjugateGradient
     nkernels = size(gradient_0, 5)
     if (myrank == 0) write(*, *) "Number of kerenels: ", nkernels
 
-    call Parallel_ComputeInnerProduct(gradient_1c, gradient_1 - gradient_0, &
+    call Parallel_ComputeInnerProduct(gradient_1, gradient_1c - gradient_0c, &
                                       nkernels, jacobian, beta_up)
-    call Parallel_ComputeL2normSquare(gradient_0, nkernels, jacobian, beta_down)
+    call Parallel_ComputeInnerProduct(gradient_0, gradient_0c, &
+                                      nkernels, jacobian, beta_down)
 
     beta = beta_up / beta_down
     ! Restart condition 1: beta must be >= 0
@@ -89,12 +90,13 @@ module ConjugateGradient
     ! endif
   end subroutine get_beta
 
-  subroutine compute_search_direction(gradient_0, gradient_1, gradient_1c, direction_0, &
+  subroutine compute_search_direction(gradient_0, gradient_0c, &
+                                      gradient_1, gradient_1c, direction_0, &
                                       jacobian, direction_1)
     ! Dimension of gradient and direction would be
     !     (NGLLX, NGLLY, NGLLZ, NSPEC, NKERNELS)
     real(kind=CUSTOM_REAL), dimension(:, :, :, :, :), intent(in) :: gradient_0, gradient_1
-    real(kind=CUSTOM_REAL), dimension(:, :, :, :, :), intent(in) :: gradient_1c
+    real(kind=CUSTOM_REAL), dimension(:, :, :, :, :), intent(in) :: gradient_0c, gradient_1c
     real(kind=CUSTOM_REAL), dimension(:, :, :, :, :), intent(in) :: direction_0
     real(kind=CUSTOM_REAL), dimension(:, :, :, :), intent(in)    :: jacobian
     real(kind=CUSTOM_REAL), dimension(:, :, :, :, :), intent(inout) :: direction_1
@@ -102,7 +104,7 @@ module ConjugateGradient
     real(kind=CUSTOM_REAL) :: beta
 
     ! call get_beta_old(gradient_0, gradient_1, beta)
-    call get_beta(gradient_0, gradient_1, gradient_1c, jacobian, beta)
+    call get_beta(gradient_0, gradient_0c, gradient_1, gradient_1c, jacobian, beta)
 
     if(myrank == 0) write(*, *) "Final beta used: ", beta
 
@@ -111,32 +113,34 @@ module ConjugateGradient
   end subroutine
 end module ConjugateGradient
 
-subroutine get_sys_args(grad_0_file, grad_1_file, grad_1c_file, &
+subroutine get_sys_args(grad_0_file, grad_0c_file, grad_1_file, grad_1c_file, &
                         direction_0_file, direction_1_file, solver_file)
 
   use global, only : myrank, exit_mpi
 
-  character(len=*), intent(inout):: grad_0_file, grad_1_file, grad_1c_file
+  character(len=*), intent(inout):: grad_0_file, grad_0c_file, grad_1_file, grad_1c_file
   character(len=*), intent(inout):: direction_0_file, direction_1_file
   character(len=*), intent(inout):: solver_file
 
   call getarg(1, grad_0_file)
-  call getarg(2, grad_1_file)
-  call getarg(3, grad_1c_file)
-  call getarg(4, direction_0_file)
-  call getarg(5, solver_file)
-  call getarg(6, direction_1_file)
+  call getarg(2, grad_0c_file)
+  call getarg(3, grad_1_file)
+  call getarg(4, grad_1c_file)
+  call getarg(5, direction_0_file)
+  call getarg(6, solver_file)
+  call getarg(7, direction_1_file)
 
   if(trim(grad_0_file) == '' .or. trim(grad_1_file) == '' &
-     .or. trim(grad_1c_file) == '' &
+     .or. trim(grad_0c_file) == '' .or. trim(grad_1c_file) == '' &
      .or. trim(direction_0_file) == '' .or. trim(direction_1_file) == '' &
      .or. trim(solver_file) == '') then
-        call exit_mpi('Usage: xcg_direction grad_0_file grad_1_file '//&
+        call exit_mpi('Usage: xcg_direction grad_0_file grad_0c_file grad_1_file '//&
           'grad_1c_file direction_0_file solver_bp_file outputfn')
   endif
 
   if(myrank == 0) then
     write(*, *) "Grad 0 file   (input): ", trim(grad_0_file)
+    write(*, *) "Grad 0 (precond) file   (input): ", trim(grad_0c_file)
     write(*, *) "Grad 1 file   (input): ", trim(grad_1_file)
     write(*, *) "Grad 1 (precond) file   (input): ", trim(grad_1c_file)
     write(*, *) "Direct 0 file (input): ", trim(direction_0_file)
@@ -162,12 +166,12 @@ program main
                             "eta_kl_crust_mantle"/)
 
   real(kind=CUSTOM_REAL), dimension(NGLLX, NGLLY, NGLLZ, NSPEC, NKERNEL):: gradient_0, gradient_1
-  real(kind=CUSTOM_REAL), dimension(NGLLX, NGLLY, NGLLZ, NSPEC, NKERNEL):: gradient_1c
+  real(kind=CUSTOM_REAL), dimension(NGLLX, NGLLY, NGLLZ, NSPEC, NKERNEL):: gradient_0c, gradient_1c
   real(kind=CUSTOM_REAL), dimension(NGLLX, NGLLY, NGLLZ, NSPEC, NKERNEL):: direction_0, direction_1
   real(kind=CUSTOM_REAL), dimension(NGLLX, NGLLY, NGLLZ, NSPEC) :: jacobian
 
   character(len=500) :: solver_file
-  character(len=500) :: grad_0_file, grad_1_file, grad_1c_file
+  character(len=500) :: grad_0_file, grad_0c_file, grad_1_file, grad_1c_file
   character(len=500) :: direction_0_file
   character(len=500) :: direction_1_file ! outputfn
 
@@ -175,7 +179,7 @@ program main
 
   call init_mpi()
 
-  call get_sys_args(grad_0_file, grad_1_file, grad_1c_file, &
+  call get_sys_args(grad_0_file, grad_0c_file, grad_1_file, grad_1c_file, &
                     direction_0_file, direction_1_file, solver_file)
 
   call adios_read_init_method(ADIOS_READ_METHOD_BP, MPI_COMM_WORLD, &
@@ -183,6 +187,7 @@ program main
 
   if (myrank == 0) write(*, *) "|<----- Start Reading ----->|"
   call read_bp_file_real(grad_0_file, kernel_names, gradient_0)
+  call read_bp_file_real(grad_0c_file, kernel_names, gradient_0c)
   call read_bp_file_real(grad_1_file, kernel_names, gradient_1)
   call read_bp_file_real(grad_1c_file, kernel_names, gradient_1c)
   call read_bp_file_real(direction_0_file, kernel_names, direction_0)
@@ -191,7 +196,7 @@ program main
   call calculate_jacobian_matrix(solver_file, jacobian)
 
   if (myrank == 0) write(*, *) "|<----- Compute Search Direction ----->|"
-  call compute_search_direction(gradient_0, gradient_1, gradient_1c, &
+  call compute_search_direction(gradient_0, gradient_0c, gradient_1, gradient_1c, &
                                 direction_0, jacobian, direction_1)
 
   if (myrank == 0) write(*, *) "|<----- Start Writing ----->|"
