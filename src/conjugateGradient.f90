@@ -65,10 +65,15 @@ module ConjugateGradient
     nkernels = size(gradient_0, 5)
     if (myrank == 0) write(*, *) "Number of kerenels: ", nkernels
 
-    call Parallel_ComputeInnerProduct(gradient_1, gradient_1c - gradient_0c, &
+    call Parallel_ComputeInnerProduct(gradient_1, gradient_1 - gradient_0, &
                                       nkernels, jacobian, beta_up)
-    call Parallel_ComputeInnerProduct(gradient_0, gradient_0c, &
+    call Parallel_ComputeInnerProduct(gradient_0, gradient_0, &
                                       nkernels, jacobian, beta_down)
+
+    if (myrank == 0) then
+      print *, beta_up
+      print *, beta_down
+    endif
 
     beta = beta_up / beta_down
     ! Restart condition 1: beta must be >= 0
