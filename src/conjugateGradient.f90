@@ -108,11 +108,11 @@ module ConjugateGradient
     real(kind=CUSTOM_REAL) :: beta
 
     ! call get_beta_old(gradient_0, gradient_1, beta)
-    call get_beta(gradient_0, gradient_0c, gradient_1, gradient_1c, direction_0, jacobian, beta)
+    ! call get_beta(gradient_0, gradient_0c, gradient_1, gradient_1c, direction_0, jacobian, beta)
 
-    if(myrank == 0) write(*, *) "Final beta used: ", beta
+    ! if(myrank == 0) write(*, *) "Final beta used: ", beta
 
-    direction_1 = -gradient_1c + beta * direction_0
+    direction_1 = -gradient_1c + 0.9 * direction_0
 
   end subroutine
 end module ConjugateGradient
