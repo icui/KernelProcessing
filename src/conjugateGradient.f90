@@ -67,14 +67,14 @@ module ConjugateGradient
     nkernels = size(gradient_0, 5)
     if (myrank == 0) write(*, *) "Number of kerenels: ", nkernels
 
-    call Parallel_ComputeInnerProduct(gradient_1, gradient_1c - gradient_0c, &
+    call Parallel_ComputeInnerProduct(gradient_1, gradient_1c, &
                                       nkernels, jacobian, beta_up)
     call Parallel_ComputeInnerProduct(gradient_0, gradient_0c, &
                                       nkernels, jacobian, beta_down1)
     call Parallel_ComputeInnerProduct(gradient_1, direction_0, &
                                       nkernels, jacobian, beta_down2)
 
-    beta = beta_up / (beta_down1 + beta_down2)
+    beta = beta_up / (beta_down1 + abs(beta_down2))
     ! Restart condition 1: beta must be >= 0
     if (beta < 0.0) then
       if (myrank == 0) write(*, *) "Beta change by restart condition(beta>=0): ", beta, "-> 0.0"
