@@ -52,25 +52,29 @@ module ConjugateGradient
     endif
   end subroutine get_beta_old
 
-  subroutine get_beta(gradient_0, gradient_0c, gradient_1, gradient_1c, jacobian, beta)
+  subroutine get_beta(gradient_0, gradient_0c, gradient_1, gradient_1c, &
+                      direction_0, jacobian, beta)
     real(kind=CUSTOM_REAL),dimension(:, :, :, :, :), intent(in):: gradient_0, gradient_1
     real(kind=CUSTOM_REAL),dimension(:, :, :, :, :), intent(in):: gradient_0c, gradient_1c
+    real(kind=CUSTOM_REAL),dimension(:, :, :, :, :), intent(in):: direction_0
     real(kind=CUSTOM_REAL),dimension(:, :, :, :), intent(in):: jacobian
     real(kind=CUSTOM_REAL), intent(inout) :: beta
 
-    real(kind=CUSTOM_REAL) :: beta_up, beta_down
+    real(kind=CUSTOM_REAL) :: beta_up, beta_down1, beta_down2
     real(kind=CUSTOM_REAL) :: orth, orth_up, orth_down
     integer :: nkernels
 
     nkernels = size(gradient_0, 5)
     if (myrank == 0) write(*, *) "Number of kerenels: ", nkernels
 
-    call Parallel_ComputeInnerProduct(gradient_1, gradient_1c - gradient_0c, &
+    call Parallel_ComputeInnerProduct(gradient_1, gradient_1c, &
                                       nkernels, jacobian, beta_up)
     call Parallel_ComputeInnerProduct(gradient_0, gradient_0c, &
-                                      nkernels, jacobian, beta_down)
+                                      nkernels, jacobian, beta_down1)
+    call Parallel_ComputeInnerProduct(gradient_1, direction_0, &
+                                      nkernels, jacobian, beta_down2)
 
-    beta = beta_up / beta_down
+    beta = beta_up / (beta_down1 + beta_down2)
     ! Restart condition 1: beta must be >= 0
     if (beta < 0.0) then
       if (myrank == 0) write(*, *) "Beta change by restart condition(beta>=0): ", beta, "-> 0.0"
@@ -104,7 +108,7 @@ module ConjugateGradient
     real(kind=CUSTOM_REAL) :: beta
 
     ! call get_beta_old(gradient_0, gradient_1, beta)
-    call get_beta(gradient_0, gradient_0c, gradient_1, gradient_1c, jacobian, beta)
+    call get_beta(gradient_0, gradient_0c, gradient_1, gradient_1c, direction_0, jacobian, beta)
 
     if(myrank == 0) write(*, *) "Final beta used: ", beta
 
