@@ -112,7 +112,7 @@ module ConjugateGradient
 
     ! if(myrank == 0) write(*, *) "Final beta used: ", beta
 
-    direction_1 = -gradient_1c + 0.1 * direction_0
+    direction_1 = -gradient_1c + 0.5 * direction_0
 
   end subroutine
 end module ConjugateGradient
