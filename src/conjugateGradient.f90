@@ -106,6 +106,8 @@ module ConjugateGradient
     real(kind=CUSTOM_REAL), dimension(:, :, :, :, :), intent(inout) :: direction_1
 
     real(kind=CUSTOM_REAL) :: beta, dot
+    integer :: nkernels
+    nkernels = size(gradient_0, 5)
 
     ! call get_beta_old(gradient_0, gradient_1, beta)
     call get_beta(gradient_0, gradient_0c, gradient_1, gradient_1c, direction_0, jacobian, beta)
@@ -114,8 +116,7 @@ module ConjugateGradient
 
     direction_1 = -gradient_1c + beta * direction_0
 
-    call Parallel_ComputeInnerProduct(direction_1, gradient_0, &
-                                      nkernels, jacobian, dot)
+    call Parallel_ComputeInnerProduct(direction_1, gradient_0, nkernels, jacobian, dot)
 
     if(myrank == 0) write(*, *) "Dot: ", dot
 
