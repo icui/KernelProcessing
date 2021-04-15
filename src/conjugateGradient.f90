@@ -105,14 +105,19 @@ module ConjugateGradient
     real(kind=CUSTOM_REAL), dimension(:, :, :, :), intent(in)    :: jacobian
     real(kind=CUSTOM_REAL), dimension(:, :, :, :, :), intent(inout) :: direction_1
 
-    real(kind=CUSTOM_REAL) :: beta
+    real(kind=CUSTOM_REAL) :: beta, dot
 
     ! call get_beta_old(gradient_0, gradient_1, beta)
-    ! call get_beta(gradient_0, gradient_0c, gradient_1, gradient_1c, direction_0, jacobian, beta)
+    call get_beta(gradient_0, gradient_0c, gradient_1, gradient_1c, direction_0, jacobian, beta)
 
     ! if(myrank == 0) write(*, *) "Final beta used: ", beta
 
-    direction_1 = -gradient_1c + 0.5 * direction_0
+    direction_1 = -gradient_1c + beta * direction_0
+
+    call Parallel_ComputeInnerProduct(direction_1, gradient_0, &
+                                      nkernels, jacobian, dot)
+
+    if(myrank == 0) write(*, *) "Dot: ", dot
 
   end subroutine
 end module ConjugateGradient
