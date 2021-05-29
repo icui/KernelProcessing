@@ -102,6 +102,7 @@ program precond_kernels
                             "precond_bulk_betav_kl_crust_mantle", &
                             "precond_bulk_c_kl_crust_mantle", "precond_eta_kl_crust_mantle"/)
 
+  real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC, 4):: hess = 0.0
   real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC, 4):: kernels = 0.0, kernels_precond = 0.0
 
   character(len=500) :: input_kernel, input_hess, output_kernel
