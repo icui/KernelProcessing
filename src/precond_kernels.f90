@@ -16,7 +16,7 @@ module precond_kernels_sub
 
   contains
 
-  subroutine get_sys_args(input_kernel, input_hess, output_kernel, threshold_hess)
+  subroutine get_sys_args(input_kernel, input_hess, output_kernel)
     character(len=*), intent(inout) :: input_kernel, input_hess, output_kernel
     real(kind=CUSTOM_REAL), intent(inout) :: threshold_hess
 
