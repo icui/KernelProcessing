@@ -18,16 +18,13 @@ module precond_kernels_sub
 
   subroutine get_sys_args(input_kernel, input_hess, output_kernel)
     character(len=*), intent(inout) :: input_kernel, input_hess, output_kernel
-    real(kind=CUSTOM_REAL), intent(inout) :: threshold_hess
-
-    character(len=20) :: threshold_str
 
     call getarg(1, input_kernel)
     call getarg(2, input_hess)
     call getarg(3, output_kernel)
 
     if(input_kernel == '' .or. input_hess == '' .or. output_kernel == '') then
-      call exit_mpi("Usage: xprecond_kernels input_kernel input_hess input_model output_kernel threshold_hess")
+      call exit_mpi("Usage: xprecond_kernels input_kernel input_hess input_model output_kernel")
     endif
 
     if(myrank == 0) then
@@ -37,45 +34,6 @@ module precond_kernels_sub
     endif
 
   end subroutine get_sys_args
-
-  subroutine prepare_hessian(hess, threshold, hess_inv)
-    real(CUSTOM_REAL), dimension(:, :, :, :), intent(inout) :: hess, hess_inv
-    real(CUSTOM_REAL), intent(in) :: threshold
-
-    real(kind=CUSTOM_REAL):: maxh_all, minh_all, damp
-
-    hess = abs(hess)
-    call max_all_all_cr(maxval(hess), maxh_all)
-    call min_all_all_cr(minval(hess), minh_all)
-
-    if ( maxh_all < 1.e-18 ) then
-      call exit_mpi("hess max value < 1.e-18")
-    endif
-
-    if (myrank==0) then
-      write(*, *) "Max and Min of hess: ", maxh_all, minh_all
-    endif
-
-    ! normalized hess
-    damp = maxh_all / threshold
-
-    if (minh_all < 0.d0) then
-      damp = damp - minh_all
-    endif
-
-    hess = (hess + damp) / (maxh_all + damp)
-    
-    call max_all_all_cr(maxval(hess), maxh_all)
-    call min_all_all_cr(minval(hess), minh_all)
-
-    if (myrank==0) then
-      write(*, *) 'min and max hess after norm', minh_all, maxh_all
-      write(*, *) "Hessian damping: ", damp
-    endif
-
-    hess_inv = 1.0_CUSTOM_REAL / hess
-    
-  end subroutine prepare_hessian
 
 end module precond_kernels_sub
 
