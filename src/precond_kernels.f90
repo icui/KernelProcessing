@@ -107,7 +107,7 @@ program precond_kernels
 
   character(len=500) :: input_kernel, input_hess, output_kernel
   real(kind=CUSTOM_REAL) :: threshold_hess
-  integer:: ier
+  integer:: ier, iker
 
   call init_mpi()
 
