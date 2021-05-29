@@ -117,8 +117,6 @@ program precond_kernels
   call read_bp_file_real(input_kernel, kernel_names, kernels)
   call read_bp_file_real(input_hess, hess_names, hess)
 
-  call prepare_hessian(hess(:, :, :, :, 1), threshold_hess, hess_inv)
-
   do iker = 1, 4
     kernels_precond(:, :, :, :, iker) = kernels(:, :, :, :, iker) * hess(:, :, :, :, iker)
   enddo
