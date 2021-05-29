@@ -25,9 +25,6 @@ module precond_kernels_sub
     call getarg(1, input_kernel)
     call getarg(2, input_hess)
     call getarg(3, output_kernel)
-    call getarg(4, threshold_str)
-
-    read(threshold_str, *) threshold_hess
 
     if(input_kernel == '' .or. input_hess == '' .or. output_kernel == '') then
       call exit_mpi("Usage: xprecond_kernels input_kernel input_hess input_model output_kernel threshold_hess")
@@ -37,7 +34,6 @@ module precond_kernels_sub
       write(*, *) "Input kernel: ", trim(input_kernel)
       write(*, *) "Input hessian: ", trim(input_hess)
       write(*, *) "Output kernel: ", trim(output_kernel)
-      write(*, *) "Threshold hessian: ", threshold_hess
     endif
 
   end subroutine get_sys_args
@@ -106,12 +102,11 @@ program precond_kernels
   real(kind=CUSTOM_REAL),dimension(NGLLX, NGLLY, NGLLZ, NSPEC, 4):: kernels = 0.0, kernels_precond = 0.0
 
   character(len=500) :: input_kernel, input_hess, output_kernel
-  real(kind=CUSTOM_REAL) :: threshold_hess
   integer:: ier, iker
 
   call init_mpi()
 
-  call get_sys_args(input_kernel, input_hess, output_kernel, threshold_hess)
+  call get_sys_args(input_kernel, input_hess, output_kernel)
   call adios_read_init_method(ADIOS_READ_METHOD_BP, MPI_COMM_WORLD, "verbose=1", ier)
 
   call read_bp_file_real(input_kernel, kernel_names, kernels)
